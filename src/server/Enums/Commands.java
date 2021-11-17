@@ -7,5 +7,6 @@ public class Commands {
     public static final String EditAdmin = "adt";
     public static final String ShowAdmin = "sad";
     public static final String Error = "err";
+    public static final String SetNewAdmin = "nad";
 
 }

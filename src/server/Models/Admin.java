@@ -2,30 +2,27 @@ package server.Models;
 
 import server.Enums.Const;
 
-public class Admin {
+public class Admin extends User {
     private int id;
     private String position;
-    private User user;
+
 
 
     public Admin(int id, String position, User user) {
+        super(user.toString());
+
         this.id = id;
         this.position = position;
-        this.user = user;
+
     }
     public Admin(String data)
     {
-        var dataAdday = data.split(Const.b);
-        System.out.println(dataAdday[0]);
-        id = Integer.parseInt(dataAdday[0]);
-        position = dataAdday[1];
-        data = "";
-        for (int i = 2; i < dataAdday.length; i++)
-        {
-            data += dataAdday[i] + Const.b;
-        }
+        super(data);
 
-        user = new User(data);
+        var dataArray = data.split(Const.b);
+
+        id = Integer.parseInt(dataArray[4]);
+        position = dataArray[5];
 
     }
 
@@ -45,17 +42,12 @@ public class Admin {
         this.position = position;
     }
 
-    public User getUser() {
-        return user;
-    }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+
 
     @Override
     public String toString()
     {
-        return id + Const.b + position + Const.b + user.toString();
+        return super.toString() + Const.b + id + Const.b + position;
     }
 }

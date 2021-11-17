@@ -47,9 +47,7 @@ public class Database {
         try {
             stmt.executeQuery(query);
             if(Objects.equals(user[0], MainAdminData.login)){
-                query = "INSERT INTO test.admin (position, userId) \n" +
-                        "VALUES ('" + MainAdminData.position + "', (SELECT id FROM test.user where login = '" + MainAdminData.login + "'))";
-                stmt.executeUpdate(query);
+               SetNewAdmin();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -129,7 +127,7 @@ public class Database {
         Admin admin = new Admin(adminStr);
         String query = "UPDATE test.admin\n" +
                 "inner join test.user on test.user.id = test.admin.userId\n" +
-                "set test.admin.position = '" + admin.getPosition() + "', test.user.login = '"+admin.getUser().getLogin()+"', test.user.name = '"+admin.getUser().getLogin()+"'\n" +
+                "set test.admin.position = '" + admin.getPosition() + "', test.user.login = '"+admin.getLogin()+"', test.user.name = '"+admin.getLogin()+"'\n" +
                 "where test.admin.id = " + admin.getId();
 
         try {
@@ -138,6 +136,37 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    public void SetNewAdmin(String data)
+    {
+        var adminData = data.split(Const.b);
+        String query = "INSERT INTO test.admin (position, userId) \n" +
+                "VALUES ('" + adminData[1] + "', (SELECT id FROM test.user where login = '" + adminData[0] + "'))";
+        try {
+        stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void SetNewAdmin(Admin admin)
+    {
+        String query = "INSERT INTO test.admin (position, userId) \n" +
+                "VALUES ('" + admin.getPosition() + "', (SELECT id FROM test.user where login = '" + admin.getLogin() + "'))";
+        try {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void SetNewAdmin()
+    {
+        String query = "INSERT INTO test.admin (position, userId) \n" +
+                "VALUES ('" + MainAdminData.position + "', (SELECT id FROM test.user where login = '" + MainAdminData.login + "'))";
+        try {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

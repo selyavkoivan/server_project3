@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class Main {
     public static void main(String[] args) {
-        new Server("127.0.0.1", 50505);
+        new Server("127.0.0.1", 60606);
     }
 }
 
@@ -84,6 +84,9 @@ class Server implements Runnable {
                     }
                     case Commands.ShowAdmin -> {
                         Server.Send(clientSocket, Database.getDatabase().getAdminData(message[1]).toString());
+                    }
+                    case Commands.SetNewAdmin -> {
+                        Database.getDatabase().SetNewAdmin(message[1]);
                     }
                     default -> {
                     }

@@ -3,10 +3,10 @@ package server.Models;
 import server.Enums.Const;
 
 public class User {
-    private int id;
-    private String login;
-    private String name;
-    private String password;
+    protected int id;
+    protected String login;
+    protected String name;
+    protected String password;
 
 
     public User(int id, String login, String name, String password) {
