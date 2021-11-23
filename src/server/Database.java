@@ -1,9 +1,9 @@
 package server;
 
-import server.Enums.Const;
+
+import com.google.gson.Gson;
 import server.Enums.MainAdminData;
-import server.Models.Admin;
-import server.Models.User;
+import server.Models.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -41,13 +41,13 @@ public class Database {
 
     public boolean reg(String data) {
 
-        String[] user = data.split(Const.b);
-        String query = "INSERT INTO test.user (login, password, name) VALUES ('" + user[0] + "', '" + user[1] + "', '" + user[2] + "');";
+        User user = new Gson().fromJson(data, User.class);
+        String query = "INSERT INTO test.user (login, password, name) VALUES ('" + user.getLogin() + "', '" + user.getPassword() + "', '" + user.getName() + "');";
 
         try {
             stmt.executeQuery(query);
-            if(Objects.equals(user[0], MainAdminData.login)){
-               SetNewAdmin();
+            if (Objects.equals(user.getLogin(), MainAdminData.login)) {
+                SetNewAdmin();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -58,15 +58,15 @@ public class Database {
     }
 
     public User sign(String data) {
-        String[] userData = data.split(Const.b);
-        String query = "SELECT * FROM test.user WHERE login = '" + userData[0] + "' AND password = '" + userData[1] + "'";
+        User user = new Gson().fromJson(data, User.class);
+        String query = "SELECT * FROM test.user WHERE login = '" + user.getLogin() + "' AND password = '" + user.getPassword() + "'";
 
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
-            User user = new User(rs.getInt("id"), rs.getString("login"), rs.getString("name"), rs.getString("password"));
+            User loginUser = new User(rs.getInt("id"), rs.getString("login"), rs.getString("name"), rs.getString("password"));
 
-            return user;
+            return loginUser;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,8 +75,8 @@ public class Database {
 
 
     }
-    public Admin getAdminData(String id)
-    {
+
+    public Admin getAdminData(String id) {
         String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.id = test.admin.userId WHERE test.admin.id = " + id;
         try {
             ResultSet rs = stmt.executeQuery(query);
@@ -89,9 +89,9 @@ public class Database {
             return null;
         }
     }
-    public Admin getAdminData(User user)
-    {
-        String query = "SELECT * FROM test.admin WHERE userID = " + user.getId();
+
+    public Admin getAdminData(User user) {
+        String query = "SELECT * FROM test.admin WHERE userID = " + user.getUserId();
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
@@ -102,16 +102,15 @@ public class Database {
             return null;
         }
     }
-    public List<User> showUsers()
-    {
+
+    public List<User> showUsers() {
         String query = "SELECT user.* FROM test.user\n" +
                 "left join test.admin on test.admin.userId = test.user.id\n" +
                 "where test.admin.id is null";
         try {
             ResultSet rs = stmt.executeQuery(query);
             List<User> users = new ArrayList<>();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 users.add(new User(rs.getInt("id"), rs.getString("login"), rs.getString("name"), rs.getString("password")));
             }
             return users;
@@ -121,14 +120,14 @@ public class Database {
             return null;
         }
     }
-    public boolean editAdmin(String adminStr)
-    {
 
-        Admin admin = new Admin(adminStr);
+    public boolean editAdmin(String adminStr) {
+
+        Admin admin = new Gson().fromJson(adminStr, Admin.class);
         String query = "UPDATE test.admin\n" +
                 "inner join test.user on test.user.id = test.admin.userId\n" +
-                "set test.admin.position = '" + admin.getPosition() + "', test.user.login = '"+admin.getLogin()+"', test.user.name = '"+admin.getLogin()+"'\n" +
-                "where test.admin.id = " + admin.getId();
+                "set test.admin.position = '" + admin.getPosition() + "', test.user.login = '" + admin.getLogin() + "', test.user.name = '" + admin.getLogin() + "'\n" +
+                "where test.admin.id = " + admin.getAdminId();
 
         try {
             stmt.executeUpdate(query);
@@ -138,19 +137,9 @@ public class Database {
             return false;
         }
     }
-    public void SetNewAdmin(String data)
-    {
-        var adminData = data.split(Const.b);
-        String query = "INSERT INTO test.admin (position, userId) \n" +
-                "VALUES ('" + adminData[1] + "', (SELECT id FROM test.user where login = '" + adminData[0] + "'))";
-        try {
-        stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void SetNewAdmin(Admin admin)
-    {
+
+    public void SetNewAdmin(String data) {
+        Admin admin = new Gson().fromJson(data, Admin.class);
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + admin.getPosition() + "', (SELECT id FROM test.user where login = '" + admin.getLogin() + "'))";
         try {
@@ -159,14 +148,58 @@ public class Database {
             e.printStackTrace();
         }
     }
-    public void SetNewAdmin()
-    {
+
+    public void SetNewAdmin(Admin admin) {
+        String query = "INSERT INTO test.admin (position, userId) \n" +
+                "VALUES ('" + admin.getPosition() + "', (SELECT id FROM test.user where login = '" + admin.getLogin() + "'))";
+        try {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void SetNewAdmin() {
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + MainAdminData.position + "', (SELECT id FROM test.user where login = '" + MainAdminData.login + "'))";
         try {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public List<Product> ShowGoods() {
+        String query = "SELECT * FROM test.product\n" +
+                "inner join test.material on test.material.id = test.product.materialId\n" +
+                "inner join test.size on test.product.id = test.size.productId";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Product> goods = new ArrayList<>();
+            while (rs.next()) {
+                if (goods.size() == 0 || goods.get(goods.size() - 1).getProductId() != rs.getInt(1)) {
+                    goods.add(new Product(
+                            rs.getInt(7),
+                            rs.getString("material"),
+                            rs.getString("color"),
+                            rs.getString("pattern"),
+                            rs.getInt(1),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getDouble("price"),
+                            rs.getString("type")));
+                }
+                goods.get(goods.size() - 1).addSize(new Size(
+                    rs.getInt(11),
+                    rs.getString("size"),
+                    rs.getInt("count")));
+
+            }
+
+            return goods;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
         }
     }
 }

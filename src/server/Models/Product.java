@@ -1,38 +1,47 @@
 package server.Models;
 
-import server.Enums.Const;
+import com.google.gson.Gson;
 
-public class Product extends Material {
-    private int id;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Product extends Material  {
+    private int productId;
     private String name;
     private String description;
     private double price;
-    private int count;
-    private String size;
+    private String type;
+    private List<Size> sizes;
 
-
-
-
-
-
-    public Product(String data)
-    {
-        super(data);
-        var dataArray = data.split(Const.b);
-        id = Integer.parseInt(dataArray[4]);
-        name = dataArray[5];
-        description = dataArray[6];
-        price = Double.parseDouble(dataArray[7]);
-        count = Integer.parseInt(dataArray[8]);
-        size = dataArray[9];
+    public Product(int materialId, String materialName, String color, String pattern, int productId, String name, String description, double price, String type) {
+        super(materialId, materialName, color, pattern);
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.type = type;
+        this.sizes = new ArrayList<>();
+    }
+    public Product(int materialId, String materialName, String color, String pattern, int productId, String name, String description, double price, String type, List<Size> sizes) {
+        super(materialId, materialName, color, pattern);
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.type = type;
+        this.sizes = sizes;
     }
 
-    public int getId() {
-        return id;
+
+
+
+    public int getProductId() {
+        return productId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setProductId(int id) {
+        this.productId = id;
     }
 
     public String getName() {
@@ -59,27 +68,30 @@ public class Product extends Material {
         this.price = price;
     }
 
-    public int getCount() {
-        return count;
+    public String getType() {
+        return type;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getSize() {
-        return size;
+    public List<Size> getSizes() {
+        return sizes;
     }
 
-    public void setSize(String size) {
-        this.size = size;
+    public void setSizes(List<Size> sizes) {
+        this.sizes = sizes;
     }
-
 
     @Override
     public String toString()
     {
-        return super.toString() + Const.b + id + Const.b + name +
-                Const.b + description + Const.b + price + Const.b + count + Const.b + size;
+        return new Gson().toJson(this);
+    }
+
+    public void addSize(Size size)
+    {
+       sizes.add(size);
     }
 }

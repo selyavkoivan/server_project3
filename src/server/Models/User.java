@@ -1,36 +1,34 @@
 package server.Models;
 
-import server.Enums.Const;
+import com.google.gson.Gson;
+
 
 public class User {
-    protected int id;
+    protected int userId;
     protected String login;
     protected String name;
     protected String password;
 
 
     public User(int id, String login, String name, String password) {
-        this.id = id;
+        this.userId = id;
         this.login = login;
         this.name = name;
         this.password = password;
     }
-    public User(String data)
-    {
-        var dataArray = data.split(Const.b);
-        id = Integer.parseInt(dataArray[0]);
-        login = dataArray[1];
-        name = dataArray[2];
-        password = dataArray[3];
-
+    public User(User user) {
+        this.userId = user.userId;
+        this.login = user.login;
+        this.name = user.name;
+        this.password = user.password;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int id) {
+        this.userId = id;
     }
 
     public String getLogin() {
@@ -60,6 +58,6 @@ public class User {
     @Override
     public String toString()
     {
-            return id + Const.b + login + Const.b + name + Const.b + password;
+            return new Gson().toJson(this);
     }
 }

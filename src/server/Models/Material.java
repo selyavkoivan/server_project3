@@ -1,36 +1,28 @@
 package server.Models;
 
-import server.Enums.Const;
+import com.google.gson.Gson;
+
 
 public class Material {
-    protected int id;
+    protected int materialId;
     protected String material;
     protected String color;
-    protected String pattern;
+        protected String pattern;
 
 
-    public Material(String data)
-    {
-        var dataArray = data.split(Const.b);
-        id = Integer.parseInt(dataArray[0]);
-        material = dataArray[1];
-        color = dataArray[2];
-        pattern = dataArray[3];
-    }
-    public Material()
-    {
-        id = 0;
-        material = "0";
-        color = "0";
-        pattern = "0";
+    public Material(int materialId, String materialName, String color, String pattern) {
+        this.materialId = materialId;
+        this.material = materialName;
+        this.color = color;
+        this.pattern = pattern;
     }
 
-    public int getId() {
-        return id;
+    public int getMaterialId() {
+        return materialId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMaterialId(int id) {
+        this.materialId = id;
     }
 
     public String getMaterial() {
@@ -60,6 +52,6 @@ public class Material {
     @Override
     public String toString()
     {
-        return id + Const.b + material + Const.b + color + Const.b + pattern;
+        return new Gson().toJson(this);
     }
 }

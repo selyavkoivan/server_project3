@@ -1,37 +1,25 @@
 package server.Models;
 
-import server.Enums.Const;
+import com.google.gson.Gson;
+
 
 public class Admin extends User {
-    private int id;
+    private int adminId;
     private String position;
 
-
-
-    public Admin(int id, String position, User user) {
-        super(user.toString());
-
-        this.id = id;
+    public Admin(int adminId, String position, User user) {
+        super(user);
+        this.adminId = adminId;
         this.position = position;
-
-    }
-    public Admin(String data)
-    {
-        super(data);
-
-        var dataArray = data.split(Const.b);
-
-        id = Integer.parseInt(dataArray[4]);
-        position = dataArray[5];
-
     }
 
-    public int getId() {
-        return id;
+
+    public int getAdminId() {
+        return adminId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAdminId(int id) {
+        this.adminId = id;
     }
 
     public String getPosition() {
@@ -48,6 +36,6 @@ public class Admin extends User {
     @Override
     public String toString()
     {
-        return super.toString() + Const.b + id + Const.b + position;
+        return new Gson().toJson(this);
     }
 }

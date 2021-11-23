@@ -1,12 +1,19 @@
 package server;
 
-import server.Enums.*;
+
+
+
+import com.google.gson.Gson;
+import server.Enums.Commands;
+import server.Enums.Role;
 import server.Models.Admin;
+import server.Models.Product;
 import server.Models.User;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -55,6 +62,7 @@ class Server implements Runnable {
 
             while (true) {
                 String[] message = splitMessage();
+                System.out.println(message[1]);
                 switch (message[0]) {
                     case Commands.SignUp -> {
                         if (Database.getDatabase().reg(message[1])) Server.Send(clientSocket, "1");
@@ -73,49 +81,40 @@ class Server implements Runnable {
                         var users = Database.getDatabase().showUsers();
                         if(users != null)
                         {
-                            Server.Send(clientSocket, ListConvertor.Users(users));
+                            Server.Send(clientSocket, new Gson().toJson(users));
                         } else
                         {
                             Server.Send(clientSocket,  Commands.Error);
                         }
                     }
-                    case Commands.EditAdmin -> {
-                         Server.Send(clientSocket,Database.getDatabase().editAdmin(message[1]) ? "1" : "0");
-                    }
-                    case Commands.ShowAdmin -> {
-                        Server.Send(clientSocket, Database.getDatabase().getAdminData(message[1]).toString());
-                    }
-                    case Commands.SetNewAdmin -> {
-                        Database.getDatabase().SetNewAdmin(message[1]);
-                    }
+                    case Commands.EditAdmin -> Server.Send(clientSocket,Database.getDatabase().editAdmin(message[1]) ? "1" : "0");
+                    case Commands.ShowAdmin -> Server.Send(clientSocket, Database.getDatabase().getAdminData(message[1]).toString());
+                    case Commands.SetNewAdmin -> Database.getDatabase().SetNewAdmin(message[1]);
+                    case Commands.ShowGoods -> Server.Send(clientSocket, new Gson().toJson(Database.getDatabase().ShowGoods()));
                     default -> {
                     }
                 }
             }
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            return;
         }
     }
 
     private String[] splitMessage() throws IOException {
         String message = Server.Recv(clientSocket);
         System.out.println(message);
-        String[] messageArr = {message.substring(0, 3), message.substring(3)};
-        return messageArr;
+        return new String[]{message.substring(0, 3), message.substring(3)};
     }
 
     public static void Send(Socket socket, String message) {
         try {
             var out = socket.getOutputStream();
-
             var messsageBuffer = message.getBytes();
             byte[] length = new byte[4];
             length[0] = (byte) (messsageBuffer.length & 0xff);
             length[1] = (byte) ((messsageBuffer.length >> 8) & 0xff);
             length[2] = (byte) ((messsageBuffer.length >> 16) & 0xff);
             length[3] = (byte) ((messsageBuffer.length >> 24) & 0xff);
-
             out.write(length);
             out.write(messsageBuffer, 0, messsageBuffer.length);
         } catch (IOException exception) {
@@ -124,18 +123,14 @@ class Server implements Runnable {
     }
 
     public static String Recv(Socket socket) throws IOException {
-
         var stream = socket.getInputStream();
         var sizeBuffer = new byte[4];
         stream.read(sizeBuffer, 0, 4);
         int size = (((sizeBuffer[3] & 0xff) << 24) | ((sizeBuffer[2] & 0xff) << 16) |
                 ((sizeBuffer[1] & 0xff) << 8) | (sizeBuffer[0] & 0xff));
-
         var messageBuffer = new byte[size];
         stream.read(messageBuffer, 0, size);
-
         return new String(messageBuffer, "UTF-8").trim();
-
     }
 }
 
