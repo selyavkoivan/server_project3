@@ -30,7 +30,10 @@ public class Product extends Material  {
         this.description = description;
         this.price = price;
         this.type = type;
-        this.sizes = sizes;
+        this.sizes = new ArrayList<>();
+
+        this.sizes.addAll(sizes);
+
     }
 
 
@@ -81,7 +84,7 @@ public class Product extends Material  {
     }
 
     public void setSizes(List<Size> sizes) {
-        this.sizes = sizes;
+        this.sizes.addAll(sizes);
     }
 
     @Override

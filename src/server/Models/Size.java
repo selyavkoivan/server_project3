@@ -19,7 +19,6 @@ public class Size {
     public int getSizeId() {
         return sizeId;
     }
-
     public void setSizeId(int id) {
         this.sizeId = id;
     }
@@ -27,7 +26,6 @@ public class Size {
     public String getSize() {
         return size;
     }
-
     public void setSize(String size) {
         this.size = size;
     }
@@ -35,7 +33,6 @@ public class Size {
     public int getCount() {
         return count;
     }
-
     public void setCount(int count) {
         this.count = count;
     }

@@ -91,8 +91,9 @@ class Server implements Runnable {
                     case Commands.ShowAdmin -> Server.Send(clientSocket, Database.getDatabase().getAdminData(message[1]).toString());
                     case Commands.SetNewAdmin -> Database.getDatabase().SetNewAdmin(message[1]);
                     case Commands.ShowGoods -> Server.Send(clientSocket, new Gson().toJson(Database.getDatabase().ShowGoods()));
-                    default -> {
-                    }
+                    case Commands.EditProduct -> Server.Send(clientSocket, Database.getDatabase().editProduct(message[1]));
+                    case Commands.AddProduct -> Database.getDatabase().addProduct(message[1]);
+                    case Commands.DeleteProduct -> Database.getDatabase().deleteProduct(message[1]);
                 }
             }
         } catch (IOException ex) {
