@@ -173,7 +173,7 @@ public class Database {
     public List<Product> ShowGoods() {
         String query = "SELECT * FROM test.product\n" +
                 "inner join test.material on test.material.id = test.product.materialId\n" +
-                "inner join test.size on test.product.id = test.size.productId";
+                "left join test.size on test.product.id = test.size.productId";
         try {
             ResultSet rs = stmt.executeQuery(query);
             List<Product> goods = new ArrayList<>();

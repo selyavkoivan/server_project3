@@ -1,12 +1,8 @@
-package test;
-
-import com.google.gson.Gson;
 import org.junit.Test;
 import server.Database;
 import server.Models.Product;
 import server.Models.Size;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +18,7 @@ public class DatabaseTest {
         List<Size> sizes = new ArrayList<>();
         sizes.add(new Size(0, "23", 32));
         sizes.add(new Size(0, "43", 12));
-        Product product = new Product(0, "Хлопок", "Зеленый", "Логотип", 0,
+        Product product = new Product(0, "Хлопок", "Коричневые", "Логотип", 0,
                 "Converse Chuck Taylor High Top", "70 лучше", 180, "Кеды", sizes);
         Database.getDatabase().addProduct(product.toString());
     }
@@ -33,14 +29,14 @@ public class DatabaseTest {
         sizes.add(new Size(0, "23", 32));
         sizes.add(new Size(0, "2", 12));
         sizes.add(new Size(0, "43", 12));
-        Product product = new Product(0, "Хлопок", "Зеленый", "Логотип", 4,
+        Product product = new Product(0, "Хлопок", "Красный", "Логотип", 4,
                 "Converse Chuck Taylor Low Top", "70 лучше", 180, "Кеды", sizes);
         Database.getDatabase().editProduct(product.toString());
     }
     @Test
     public void testDatabaseDeleteProduct()
     {
-        Product product = new Product(0, "", "", "", 4,
+        Product product = new Product(0, "", "", "", 12,
                 "", "", 180, "");
         Database.getDatabase().deleteProduct(product.toString());
     }
