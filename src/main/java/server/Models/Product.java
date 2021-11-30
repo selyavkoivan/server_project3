@@ -1,11 +1,15 @@
 package server.Models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class Product extends Material  {
     private int productId;
     private String name;
@@ -36,55 +40,9 @@ public class Product extends Material  {
 
     }
 
-
-
-
-    public int getProductId() {
-        return productId;
-    }
-
-    public void setProductId(int id) {
-        this.productId = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<Size> getSizes() {
-        return sizes;
-    }
-
-    public void setSizes(List<Size> sizes) {
-        this.sizes.addAll(sizes);
+    public Product(){
+        super();
+        this.sizes = new ArrayList<>();
     }
 
     @Override

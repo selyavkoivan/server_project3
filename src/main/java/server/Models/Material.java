@@ -1,8 +1,11 @@
 package server.Models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 public class Material {
     protected int materialId;
     protected String material;
@@ -17,38 +20,7 @@ public class Material {
         this.pattern = pattern;
     }
 
-    public int getMaterialId() {
-        return materialId;
-    }
-
-    public void setMaterialId(int id) {
-        this.materialId = id;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getPattern() {
-        return pattern;
-    }
-
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    }
-
+    public Material() {}
     @Override
     public String toString()
     {

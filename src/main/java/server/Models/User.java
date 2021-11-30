@@ -1,8 +1,11 @@
 package server.Models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 public class User {
     protected int userId;
     protected String login;
@@ -22,39 +25,7 @@ public class User {
         this.name = user.name;
         this.password = user.password;
     }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int id) {
-        this.userId = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
+    public User() {}
     @Override
     public String toString()
     {

@@ -1,40 +1,31 @@
 package server;
 
 
-
-
 import com.google.gson.Gson;
+import server.Database.DatabaseManager;
 import server.Enums.Commands;
 import server.Enums.Role;
 import server.Models.Admin;
-import server.Models.Product;
 import server.Models.User;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        new Server("127.0.0.1", 60606);
+        new Server(60606);
     }
 }
 
 
 class Server implements Runnable {
-    private Database database;
-    private String serverName;
-    private boolean isRunning;
-
     private ServerSocket serverSocket;
     private Socket clientSocket;
 
-    public Server(String name, int port) {
+    public Server(int port) {
         try {
-            this.serverName = name;
             this.serverSocket = new ServerSocket(port);
-            this.isRunning = true;
             new Thread(this).start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,11 +34,9 @@ class Server implements Runnable {
 
 
     public void run() {
-        while (isRunning) {
+        while (true) {
             try {
-
                 clientSocket = serverSocket.accept();
-
                 Menu();
                 clientSocket.close();
             } catch (IOException e) {
@@ -65,20 +54,20 @@ class Server implements Runnable {
                 System.out.println(message[1]);
                 switch (message[0]) {
                     case Commands.SignUp -> {
-                        if (Database.getDatabase().reg(message[1])) Server.Send(clientSocket, "1");
+                        if (DatabaseManager.getDatabase().reg(message[1])) Server.Send(clientSocket, "1");
                         else Server.Send(clientSocket, "0");
                     }
                     case Commands.SignIn -> {
-                       User user = Database.getDatabase().sign(message[1]);
+                       User user = DatabaseManager.getDatabase().sign(message[1]);
                        if(user != null) {
-                           Admin admin  = Database.getDatabase().getAdminData(user);
+                           Admin admin  = DatabaseManager.getDatabase().getAdminData(user);
                            if (admin != null) Server.Send(clientSocket, Role.Admin.toString() + admin);
                            else Server.Send(clientSocket, Role.User.toString() + user);
                        }
                        else Server.Send(clientSocket, Role.Error.toString());
                     }
                     case Commands.ShowUsers -> {
-                        var users = Database.getDatabase().showUsers();
+                        var users = DatabaseManager.getDatabase().showUsers();
                         if(users != null)
                         {
                             Server.Send(clientSocket, new Gson().toJson(users));
@@ -87,13 +76,13 @@ class Server implements Runnable {
                             Server.Send(clientSocket,  Commands.Error);
                         }
                     }
-                    case Commands.EditAdmin -> Server.Send(clientSocket,Database.getDatabase().editAdmin(message[1]) ? "1" : "0");
-                    case Commands.ShowAdmin -> Server.Send(clientSocket, Database.getDatabase().getAdminData(message[1]).toString());
-                    case Commands.SetNewAdmin -> Database.getDatabase().SetNewAdmin(message[1]);
-                    case Commands.ShowGoods -> Server.Send(clientSocket, new Gson().toJson(Database.getDatabase().ShowGoods()));
-                    case Commands.EditProduct -> Server.Send(clientSocket, Database.getDatabase().editProduct(message[1]));
-                    case Commands.AddProduct -> Database.getDatabase().addProduct(message[1]);
-                    case Commands.DeleteProduct -> Database.getDatabase().deleteProduct(message[1]);
+                    case Commands.EditAdmin -> Server.Send(clientSocket, DatabaseManager.getDatabase().editAdmin(message[1]) ? "1" : "0");
+                    case Commands.ShowAdmin -> Server.Send(clientSocket, DatabaseManager.getDatabase().getAdminData(message[1]).toString());
+                    case Commands.SetNewAdmin -> DatabaseManager.getDatabase().SetNewAdmin(message[1]);
+                    case Commands.ShowGoods -> Server.Send(clientSocket, new Gson().toJson(DatabaseManager.getDatabase().ShowGoods()));
+                    case Commands.EditProduct -> Server.Send(clientSocket, DatabaseManager.getDatabase().editProduct(message[1]));
+                    case Commands.AddProduct -> DatabaseManager.getDatabase().addProduct(message[1]);
+                    case Commands.DeleteProduct -> DatabaseManager.getDatabase().deleteProduct(message[1]);
                 }
             }
         } catch (IOException ex) {

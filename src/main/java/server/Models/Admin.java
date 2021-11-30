@@ -1,8 +1,11 @@
 package server.Models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 public class Admin extends User {
     private int adminId;
     private String position;
@@ -12,27 +15,9 @@ public class Admin extends User {
         this.adminId = adminId;
         this.position = position;
     }
-
-
-    public int getAdminId() {
-        return adminId;
+    public Admin() {
+        super();
     }
-
-    public void setAdminId(int id) {
-        this.adminId = id;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-
-
-
     @Override
     public String toString()
     {

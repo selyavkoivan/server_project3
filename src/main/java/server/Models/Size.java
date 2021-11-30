@@ -1,8 +1,11 @@
 package server.Models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 public class Size {
     private int sizeId;
     private String size;
@@ -13,27 +16,6 @@ public class Size {
     public Size(int id, String size, int count) {
         this.sizeId = id;
         this.size = size;
-        this.count = count;
-    }
-
-    public int getSizeId() {
-        return sizeId;
-    }
-    public void setSizeId(int id) {
-        this.sizeId = id;
-    }
-
-    public String getSize() {
-        return size;
-    }
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public int getCount() {
-        return count;
-    }
-    public void setCount(int count) {
         this.count = count;
     }
 
