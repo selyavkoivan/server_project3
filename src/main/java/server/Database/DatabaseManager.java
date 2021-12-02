@@ -2,8 +2,8 @@ package server.Database;
 
 
 import com.google.gson.Gson;
+import server.Enums.Answer;
 import server.Enums.MainAdminData;
-import server.Enums.Role;
 import server.Models.*;
 
 import java.sql.*;
@@ -44,7 +44,7 @@ public class DatabaseManager {
         }
     }
 
-    public boolean reg(String data) {
+    public String reg(String data) {
 
         User user = new Gson().fromJson(data, User.class);
         String query = "INSERT INTO test.user (login, password, name) VALUES ('" + user.getLogin() + "', '" + user.getPassword() + "', '" + user.getName() + "');";
@@ -56,9 +56,9 @@ public class DatabaseManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return Answer.Error.toString();
         }
-        return true;
+        return Answer.Success.toString();
 
     }
 
@@ -126,7 +126,7 @@ public class DatabaseManager {
         }
     }
 
-    public boolean editAdmin(String adminStr) {
+    public String editAdmin(String adminStr) {
 
         Admin admin = new Gson().fromJson(adminStr, Admin.class);
         String query = "UPDATE test.admin\n" +
@@ -136,42 +136,32 @@ public class DatabaseManager {
 
         try {
             stmt.executeUpdate(query);
-            return true;
+            return Answer.Success.toString();
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return Answer.Error.toString();
         }
     }
 
-    public void SetNewAdmin(String data) {
+    public void SetNewAdmin(String data) throws SQLException {
         Admin admin = new Gson().fromJson(data, Admin.class);
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + admin.getPosition() + "', (SELECT userId FROM test.user where login = '" + admin.getLogin() + "'))";
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt.executeUpdate(query);
     }
 
-    public void SetNewAdmin(Admin admin) {
+    public void SetNewAdmin(Admin admin) throws SQLException {
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + admin.getPosition() + "', (SELECT userId FROM test.user where login = '" + admin.getLogin() + "'))";
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt.executeUpdate(query);
     }
 
-    public void SetNewAdmin() {
+    public void SetNewAdmin() throws SQLException {
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + MainAdminData.position + "', (SELECT userId FROM test.user where login = '" + MainAdminData.login + "'))";
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+        stmt.executeUpdate(query);
+
     }
 
     public List<Product> ShowGoods() {
@@ -194,7 +184,7 @@ public class DatabaseManager {
                             rs.getDouble("price"),
                             rs.getString("type")));
                 }
-                goods.get(goods.size() - 1).addSize(new Size(
+                if (rs.getInt(11) != 0) goods.get(goods.size() - 1).addSize(new Size(
                         rs.getInt(11),
                         rs.getString("size"),
                         rs.getInt("count")));
@@ -202,6 +192,40 @@ public class DatabaseManager {
             }
 
             return goods;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    public Product ShowProduct(String message) {
+        Product product = new Gson().fromJson(message, Product.class);
+        String query = "SELECT * FROM test.product\n" +
+                "inner join test.material on test.material.materialId = test.product.materialId\n" +
+                "left join test.size on test.product.productId = test.size.productId\n" +
+                "WHERE test.product.productId = " + product.getProductId() + ";";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            rs.next();
+            Product selectedProduct = new Product(
+                    rs.getInt(7),
+                    rs.getString("material"),
+                    rs.getString("color"),
+                    rs.getString("pattern"),
+                    rs.getInt(1),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getDouble("price"),
+                    rs.getString("type"));
+            while (rs.next()) {
+                selectedProduct.addSize(new Size(
+                        rs.getInt(11),
+                        rs.getString("size"),
+                        rs.getInt("count")));
+
+            }
+
+            return selectedProduct;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return null;
@@ -223,82 +247,92 @@ public class DatabaseManager {
             query = "delete from test.size where test.size.productId = " + product.getProductId() + ";";
             stmt.executeUpdate(query);
             getInsertSizeQuery(product.getSizes(), product.getProductId());
-            return Role.Success.toString();
+            return Answer.Success.toString();
         } catch (SQLException e) {
             e.printStackTrace();
-            return Role.Error.toString();
+            return Answer.Error.toString();
         }
     }
 
-    public void addProduct(String message) {
-        try {
-            Product product = new Gson().fromJson(message, Product.class);
-            String query = "INSERT INTO test.material (material, color, pattern)\n" +
-                    "VALUES ('" + product.getMaterial() + "', '" + product.getColor() + "', '" + product.getPattern() + "');";
-            stmt.executeUpdate(query);
-            query = "INSERT INTO test.product (name, description, price, type, materialId)\n" +
-                    "VALUES ('" + product.getName() + "', '" + product.getDescription() + "', " +
-                    product.getPrice() + ", '" + product.getType() + "', (select max(materialId)\n" +
-                    "from test.material));";
-            stmt.executeUpdate(query);
-            if (product.getSizes().size() != 0)
-            {
-                query = "select max(productId) from test.product";
-                ResultSet rs = stmt.executeQuery(query);
-                rs.next();
-                getInsertSizeQuery(product.getSizes(), rs.getInt(1));
-            }
+    public void addProduct(String message) throws SQLException {
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Product product = new Gson().fromJson(message, Product.class);
+        String query = "INSERT INTO test.material (material, color, pattern)\n" +
+                "VALUES ('" + product.getMaterial() + "', '" + product.getColor() + "', '" + product.getPattern() + "');";
+        stmt.executeUpdate(query);
+        query = "INSERT INTO test.product (name, description, price, type, materialId)\n" +
+                "VALUES ('" + product.getName() + "', '" + product.getDescription() + "', " +
+                product.getPrice() + ", '" + product.getType() + "', (select max(materialId)\n" +
+                "from test.material));";
+        stmt.executeUpdate(query);
+        if (product.getSizes().size() != 0) {
+            query = "select max(productId) from test.product";
+            ResultSet rs = stmt.executeQuery(query);
+            rs.next();
+            getInsertSizeQuery(product.getSizes(), rs.getInt(1));
         }
     }
-    public void deleteProduct(String message)
-    {
+
+    public void deleteProduct(String message) throws SQLException {
         Product product = new Gson().fromJson(message, Product.class);
         String query = "DELETE FROM test.product WHERE test.product.productId = " + product.getProductId();
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt.executeUpdate(query);
+
     }
-    public void deleteSize(String message)
-    {
+
+    public void deleteSize(String message) throws SQLException {
         Size size = new Gson().fromJson(message, Size.class);
         String query = "DELETE FROM test.size WHERE test.size.sizeId = " + size.getSizeId();
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt.executeUpdate(query);
+
     }
 
     private void getInsertSizeQuery(List<Size> sizes, int id) throws SQLException {
         for (var size :
                 sizes) {
-            String query = "INSERT INTO test.size (size, count, productId)\n"+
+            String query = "INSERT INTO test.size (size, count, productId)\n" +
                     "VALUES ('" + size.getSize() + "', " + size.getCount() + ", " + id + ");";
             stmt.executeUpdate(query);
         }
     }
 
-    public void createOrder(String message)
-    {
+    public String createOrder(String message) throws SQLException {
         Order order = new Gson().fromJson(message, Order.class);
-        String query = "INSERT INTO test.order (userId, sizeId, countInOrder, date)\n" +
-                "VALUES (" + order.getUser().getUserId() + ", "+ order.getProduct().getSizes().get(0).getSizeId() +
-                ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "');";
-        try {
+        if (checkSizeCount(order) == Answer.Success.toString()) {
+            String query = "";
+            if (order.isDelivery())
+                query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryAddress)\n" +
+                        "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
+                        ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "', " + order.isDelivery() + ", '" +
+                        order.getDeliveryAddress() + "');";
+            else query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery)\n" +
+                    "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
+                    ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "', " + order.isDelivery() + ");";
             stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return Answer.Success.toString();
         }
+        return Answer.Error.toString();
     }
 
-    public List<Order> showOrders()
-    {
+    private String checkSizeCount(Order order) throws SQLException {
+        String query = "SELECT count FROM test.size\n" +
+                "WHERE sizeId = " + order.getProduct().getSizes().get(0).getSizeId() + ";";
+        ResultSet rs = stmt.executeQuery(query);
+        rs.next();
+        if (rs.getInt(1) >= order.getCount()) {
+            editSizeCount(order, rs.getInt(1));
+            return Answer.Success.toString();
+        }
+        return Answer.Error.toString();
+    }
+
+    private void editSizeCount(Order order, int count) throws SQLException {
+        String query = "UPDATE test.size SET count = " + (count - order.getCount()) + " WHERE test.size.sizeId = " +
+                order.getProduct().getSizes().get(0).getSizeId() + ";";
+        stmt.executeUpdate(query);
+    }
+
+    public List<Order> showOrders() {
 
         String query = "SELECT * FROM test.order\n" +
                 "inner join test.size on test.size.sizeID = test.order.sizeID\n" +
@@ -311,14 +345,14 @@ public class DatabaseManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(23), rs.getString("password")),
+                                rs.getString(25), rs.getString("password")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
-                                rs.getInt("productId"), rs.getString(11),
+                                rs.getInt("productId"), rs.getString(13),
                                 rs.getString("description"), rs.getDouble("price"),
                                 rs.getString("type")),
-                        rs.getInt("countInOrder"),
-                        rs.getDate("date"));
+                        rs.getInt("countInOrder"), rs.getDate("date"),
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"));
                 order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
                         rs.getInt("count")));
                 orders.add(order);
@@ -329,15 +363,46 @@ public class DatabaseManager {
             return null;
         }
     }
-    public void deleteOrder(String message)
-    {
+
+    public List<Order> showUserOrders(String message) {
+        User user = new Gson().fromJson(message, User.class);
+        String query = "SELECT * FROM test.order\n" +
+                "inner join test.size on test.size.sizeID = test.order.sizeID\n" +
+                "inner join test.product on test.product.productId = test.size.productId\n" +
+                "inner join test.material on test.material.materialId = test.product.materialId\n" +
+                "inner join test.user on test.user.userId = test.order.userId\n" +
+                "WHERE test.order.userId = " + user.getUserId() + ";";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Order> orders = new ArrayList<>();
+            while (rs.next()) {
+                Order order = new Order(rs.getInt("orderId"),
+                        new User(rs.getInt("userId"), rs.getString("login"),
+                                rs.getString(25), rs.getString("password")),
+                        new Product(rs.getInt("materialId"), rs.getString("material"),
+                                rs.getString("color"), rs.getString("pattern"),
+                                rs.getInt("productId"), rs.getString(13),
+                                rs.getString("description"), rs.getDouble("price"),
+                                rs.getString("type")),
+                        rs.getInt("countInOrder"), rs.getDate("date"),
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"));
+                order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
+                        rs.getInt("count")));
+                orders.add(order);
+            }
+            return orders;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void deleteOrder(String message) throws SQLException {
         Order order = new Gson().fromJson(message, Order.class);
         String query = "DELETE FROM test.order\n" +
                 "WHERE test.order.orderId = " + order.getOrderId();
-        try {
-            stmt.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt.executeUpdate(query);
     }
+
+
 }

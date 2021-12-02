@@ -16,13 +16,17 @@ public class Order {
     private Product product;
     private int count;
     private Date date;
+    private boolean delivery;
+    private String deliveryAddress;
 
-    public Order(int orderId, User user, Product product, int count, Date date) {
+    public Order(int orderId, User user, Product product, int count, Date date, boolean delivery, String deliveryAddress) {
         this.orderId = orderId;
         this.user = user;
         this.product = product;
         this.count = count;
         this.date = date;
+        this.delivery = delivery;
+        this.deliveryAddress = deliveryAddress;
     }
     public Order()
     {

@@ -6,20 +6,21 @@ import server.Models.Product;
 import server.Models.Size;
 import server.Models.User;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class DatabaseTest {
     @Test
-    public void testDatabaseAddProductWithoutSizes() {
+    public void testDatabaseAddProductWithoutSizes() throws SQLException {
         Product product = new Product(0, "Хлопок", "Зеленый", "Логотип", 0,
                 "Converse Chuck Taylor High Top", "70 лучше", 180, "Кеды");
         DatabaseManager.getDatabase().addProduct(product.toString());
     }
 
     @Test
-    public void testDatabaseAddProduct() {
+    public void testDatabaseAddProduct() throws SQLException {
         List<Size> sizes = new ArrayList<>();
         sizes.add(new Size(0, "23", 32));
         sizes.add(new Size(0, "43", 12));
@@ -29,7 +30,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testDatabaseEditProduct() {
+    public void testDatabaseEditProduct() throws SQLException {
         List<Size> sizes = new ArrayList<>();
         sizes.add(new Size(0, "23", 32));
         sizes.add(new Size(0, "2", 12));
@@ -40,7 +41,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testDatabaseDeleteProduct() {
+    public void testDatabaseDeleteProduct() throws SQLException {
         Product product = new Product(){{
             setProductId(12);
         }};
@@ -48,21 +49,19 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testDatabaseShowOrders()
-    {
-        System.out.println(new Gson().toJson(DatabaseManager.getDatabase().showOrders()));
-    }
-    @Test
-    public void testDatabaseShowUsers()
-    {
+    public void testDatabaseShowUsers() throws SQLException {
         System.out.println(new Gson().toJson(DatabaseManager.getDatabase().showUsers()));
     }
     @Test
-    public void testDatabaseCreateOrder()
-    {
+    public void testDatabaseShowOrders() throws SQLException {
+        System.out.println(new Gson().toJson(DatabaseManager.getDatabase().showOrders()));
+    }
+    @Test
+    public void testDatabaseCreateOrder() throws SQLException {
         Order order = new Order();
         order.setCount(1);
         order.setDate(new Date());
+        order.setDelivery(false);
         User user = new User();
         user.setUserId(5);
         order.setUser(user);
@@ -71,8 +70,7 @@ public class DatabaseTest {
         DatabaseManager.getDatabase().createOrder(new Gson().toJson(order));
     }
     @Test
-    public void testDatabaseDeleteOrder()
-    {
+    public void testDatabaseDeleteOrder() throws SQLException {
         Order order = new Order();
         order.setOrderId(11);
         DatabaseManager.getDatabase().deleteOrder(new Gson().toJson(order));

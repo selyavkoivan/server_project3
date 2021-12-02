@@ -10,7 +10,7 @@ public class Material {
     protected int materialId;
     protected String material;
     protected String color;
-        protected String pattern;
+    protected String pattern;
 
 
     public Material(int materialId, String materialName, String color, String pattern) {
