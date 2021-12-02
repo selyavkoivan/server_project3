@@ -217,12 +217,15 @@ public class DatabaseManager {
                     rs.getString("description"),
                     rs.getDouble("price"),
                     rs.getString("type"));
+            selectedProduct.addSize(new Size(
+                    rs.getInt(11),
+                    rs.getString("size"),
+                    rs.getInt("count")));
             while (rs.next()) {
                 selectedProduct.addSize(new Size(
                         rs.getInt(11),
                         rs.getString("size"),
                         rs.getInt("count")));
-
             }
 
             return selectedProduct;
