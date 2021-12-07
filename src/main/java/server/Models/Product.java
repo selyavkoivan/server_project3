@@ -1,16 +1,17 @@
 package server.Models;
 
 import com.google.gson.Gson;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-public class Product extends Material  {
+@Builder(builderMethodName = "productBuilder")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product extends Material {
     private int productId;
     private String name;
     private String description;
@@ -40,10 +41,6 @@ public class Product extends Material  {
 
     }
 
-    public Product(){
-        super();
-        this.sizes = new ArrayList<>();
-    }
 
     @Override
     public String toString()

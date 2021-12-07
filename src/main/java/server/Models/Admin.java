@@ -1,11 +1,13 @@
 package server.Models;
 
-import com.google.gson.Gson;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import server.FactoryGson.GsonGetter;
 
 @Getter
 @Setter
+@Builder(builderMethodName = "adminBuilder")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Admin extends User {
     private int adminId;
     private String position;
@@ -15,12 +17,9 @@ public class Admin extends User {
         this.adminId = adminId;
         this.position = position;
     }
-    public Admin() {
-        super();
-    }
     @Override
     public String toString()
     {
-        return new Gson().toJson(this);
+        return new GsonGetter().getGson().toJson(this);
     }
 }

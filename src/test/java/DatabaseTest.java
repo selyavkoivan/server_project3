@@ -1,10 +1,8 @@
 import com.google.gson.Gson;
 import org.junit.Test;
 import server.Database.DatabaseManager;
-import server.Models.Order;
-import server.Models.Product;
-import server.Models.Size;
-import server.Models.User;
+import server.FactoryGson.GsonDateFormatGetter;
+import server.Models.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,14 +56,9 @@ public class DatabaseTest {
     }
     @Test
     public void testDatabaseCreateOrder() throws SQLException {
-        Order order = new Order();
-        order.setCount(1);
-        order.setDate(new Date());
-        order.setDelivery(false);
-        User user = new User();
-        user.setUserId(5);
-        order.setUser(user);
-        order.setProduct(new Product());
+
+        Order order = Order.orderBuilder().count(1).date(new Date()).delivery(false).user(User.userBuilder().userId(5).build()).
+                product(Product.productBuilder().sizes(new ArrayList<>()).build()).build();
         order.getProduct().addSize(new Size(4, "2", 2));
         DatabaseManager.getDatabase().createOrder(new Gson().toJson(order));
     }
@@ -74,5 +67,11 @@ public class DatabaseTest {
         Order order = new Order();
         order.setOrderId(11);
         DatabaseManager.getDatabase().deleteOrder(new Gson().toJson(order));
+    }
+
+    @Test
+    public void testDateTimeFormat()
+    {
+        System.out.println(new GsonDateFormatGetter().getGson().toJson(new Date()));
     }
 }

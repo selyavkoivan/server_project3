@@ -1,7 +1,7 @@
 package server.Enums;
 
 public enum Answer {
-    Error("e"), Success("s");
+    ERROR("e"), SUCCESS("s");
     private String code;
     Answer(String code){
         this.code = code;

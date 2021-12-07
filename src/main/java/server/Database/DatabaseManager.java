@@ -4,6 +4,7 @@ package server.Database;
 import com.google.gson.Gson;
 import server.Enums.Answer;
 import server.Enums.MainAdminData;
+import server.FactoryGson.GsonDateFormatGetter;
 import server.Models.*;
 
 import java.sql.*;
@@ -51,14 +52,14 @@ public class DatabaseManager {
 
         try {
             stmt.executeQuery(query);
-            if (Objects.equals(user.getLogin(), MainAdminData.login)) {
+            if (Objects.equals(user.getLogin(), MainAdminData.LOGIN)) {
                 SetNewAdmin();
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return Answer.Error.toString();
+            return Answer.ERROR.toString();
         }
-        return Answer.Success.toString();
+        return Answer.SUCCESS.toString();
 
     }
 
@@ -81,8 +82,9 @@ public class DatabaseManager {
 
     }
 
-    public Admin getAdminData(String id) {
-        String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.userId = test.admin.userId WHERE test.admin.adminId = " + id;
+    public Admin getAdminData(String message) {
+        Admin admin = new Gson().fromJson(message, Admin.class);
+        String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.userId = test.admin.userId WHERE test.admin.adminId = " + admin.getAdminId();
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
@@ -136,10 +138,10 @@ public class DatabaseManager {
 
         try {
             stmt.executeUpdate(query);
-            return Answer.Success.toString();
+            return Answer.SUCCESS.toString();
         } catch (SQLException e) {
             e.printStackTrace();
-            return Answer.Error.toString();
+            return Answer.ERROR.toString();
         }
     }
 
@@ -158,7 +160,7 @@ public class DatabaseManager {
 
     public void SetNewAdmin() throws SQLException {
         String query = "INSERT INTO test.admin (position, userId) \n" +
-                "VALUES ('" + MainAdminData.position + "', (SELECT userId FROM test.user where login = '" + MainAdminData.login + "'))";
+                "VALUES ('" + MainAdminData.POSITION + "', (SELECT userId FROM test.user where login = '" + MainAdminData.LOGIN + "'))";
 
         stmt.executeUpdate(query);
 
@@ -250,10 +252,10 @@ public class DatabaseManager {
             query = "delete from test.size where test.size.productId = " + product.getProductId() + ";";
             stmt.executeUpdate(query);
             getInsertSizeQuery(product.getSizes(), product.getProductId());
-            return Answer.Success.toString();
+            return Answer.SUCCESS.toString();
         } catch (SQLException e) {
             e.printStackTrace();
-            return Answer.Error.toString();
+            return Answer.ERROR.toString();
         }
     }
 
@@ -301,7 +303,7 @@ public class DatabaseManager {
 
     public String createOrder(String message) throws SQLException {
         Order order = new Gson().fromJson(message, Order.class);
-        if (checkSizeCount(order) == Answer.Success.toString()) {
+        if (checkSizeCount(order) == Answer.SUCCESS.toString()) {
             String query = "";
             if (order.isDelivery())
                 query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryAddress)\n" +
@@ -312,9 +314,9 @@ public class DatabaseManager {
                     "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
                     ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "', " + order.isDelivery() + ");";
             stmt.executeUpdate(query);
-            return Answer.Success.toString();
+            return Answer.SUCCESS.toString();
         }
-        return Answer.Error.toString();
+        return Answer.ERROR.toString();
     }
 
     private String checkSizeCount(Order order) throws SQLException {
@@ -324,9 +326,9 @@ public class DatabaseManager {
         rs.next();
         if (rs.getInt(1) >= order.getCount()) {
             editSizeCount(order, rs.getInt(1));
-            return Answer.Success.toString();
+            return Answer.SUCCESS.toString();
         }
-        return Answer.Error.toString();
+        return Answer.ERROR.toString();
     }
 
     private void editSizeCount(Order order, int count) throws SQLException {
@@ -393,6 +395,7 @@ public class DatabaseManager {
                         rs.getInt("count")));
                 orders.add(order);
             }
+            System.out.println(new GsonDateFormatGetter().getGson().toJson(orders));
             return orders;
         } catch (SQLException e) {
             e.printStackTrace();

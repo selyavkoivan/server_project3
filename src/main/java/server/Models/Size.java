@@ -1,27 +1,22 @@
 package server.Models;
 
-import com.google.gson.Gson;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import server.FactoryGson.GsonGetter;
 
 @Getter
 @Setter
+@Builder(builderMethodName = "sizeBuilder")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Size {
     private int sizeId;
     private String size;
     private int count;
 
 
-
-    public Size(int id, String size, int count) {
-        this.sizeId = id;
-        this.size = size;
-        this.count = count;
-    }
-
     @Override
     public String toString()
     {
-        return new Gson().toJson(this);
+        return new GsonGetter().getGson().toJson(this);
     }
 }
