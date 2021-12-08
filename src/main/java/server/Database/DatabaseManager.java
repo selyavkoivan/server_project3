@@ -2,14 +2,14 @@ package server.Database;
 
 
 import com.google.gson.Gson;
-import server.Enums.Answer;
-import server.Enums.MainAdminData;
-import server.FactoryGson.GsonDateFormatGetter;
+import server.Consts.Answer;
+import server.Consts.DateFormatter;
+import server.Consts.MainAdminData;
 import server.Models.*;
 
-import java.sql.*;
-import java.text.Format;
-import java.text.SimpleDateFormat;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,32 +17,16 @@ import java.util.Objects;
 
 public class DatabaseManager {
 
-    // JDBC URL, username and password of MySQL server
-    private static final String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&serverTimezone=UTC";
-    private static final String user = "root";
-    private static final String password = "40igavumlih";
+    private static Statement stmt;
+    private static DatabaseManager databaseManager;
 
-    // JDBC variables for opening and managing connection
-    private Connection con;
-    private Statement stmt;
-    private static DatabaseManager database;
-    private Format formatter;
-
-    public static DatabaseManager getDatabase() {
-        if (database == null) {
-            database = new DatabaseManager();
-        }
-        return database;
+    public static DatabaseManager getDatabaseManager() {
+        if (databaseManager == null) databaseManager = new DatabaseManager();
+        return databaseManager;
     }
 
     private DatabaseManager() {
-        try {
-            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            con = DriverManager.getConnection(url, user, password);
-            stmt = con.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        stmt = DataBase.getDatabase().getStmt();
     }
 
     public String reg(String data) {
@@ -308,11 +292,11 @@ public class DatabaseManager {
             if (order.isDelivery())
                 query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryAddress)\n" +
                         "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
-                        ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "', " + order.isDelivery() + ", '" +
+                        ", " + order.getCount() + ", '" + DateFormatter.DateTimeFormatter.format(order.getDate()) + "', " + order.isDelivery() + ", '" +
                         order.getDeliveryAddress() + "');";
             else query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery)\n" +
                     "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
-                    ", " + order.getCount() + ", '" + formatter.format(order.getDate()) + "', " + order.isDelivery() + ");";
+                    ", " + order.getCount() + ", '" + DateFormatter.DateTimeFormatter.format(order.getDate()) + "', " + order.isDelivery() + ");";
             stmt.executeUpdate(query);
             return Answer.SUCCESS.toString();
         }
@@ -395,7 +379,6 @@ public class DatabaseManager {
                         rs.getInt("count")));
                 orders.add(order);
             }
-            System.out.println(new GsonDateFormatGetter().getGson().toJson(orders));
             return orders;
         } catch (SQLException e) {
             e.printStackTrace();

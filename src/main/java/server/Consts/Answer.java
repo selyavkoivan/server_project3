@@ -1,4 +1,4 @@
-package server.Enums;
+package server.Consts;
 
 public enum Answer {
     ERROR("e"), SUCCESS("s");

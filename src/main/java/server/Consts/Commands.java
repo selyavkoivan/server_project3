@@ -1,4 +1,4 @@
-package server.Enums;
+package server.Consts;
 
 public class Commands {
     public static final String SIGN_UP = "reg";

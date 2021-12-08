@@ -2,7 +2,10 @@ import com.google.gson.Gson;
 import org.junit.Test;
 import server.Database.DatabaseManager;
 import server.FactoryGson.GsonDateFormatGetter;
-import server.Models.*;
+import server.Models.Order;
+import server.Models.Product;
+import server.Models.Size;
+import server.Models.User;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ public class DatabaseTest {
     public void testDatabaseAddProductWithoutSizes() throws SQLException {
         Product product = new Product(0, "Хлопок", "Зеленый", "Логотип", 0,
                 "Converse Chuck Taylor High Top", "70 лучше", 180, "Кеды");
-        DatabaseManager.getDatabase().addProduct(product.toString());
+        DatabaseManager.getDatabaseManager().addProduct(product.toString());
     }
 
     @Test
@@ -24,7 +27,7 @@ public class DatabaseTest {
         sizes.add(new Size(0, "43", 12));
         Product product = new Product(0, "Хлопок", "Коричневые", "Логотип", 0,
                 "Converse Chuck Taylor High Top", "70 лучше", 180, "Кеды", sizes);
-        DatabaseManager.getDatabase().addProduct(product.toString());
+        DatabaseManager.getDatabaseManager().addProduct(product.toString());
     }
 
     @Test
@@ -35,7 +38,7 @@ public class DatabaseTest {
         sizes.add(new Size(0, "43", 12));
         Product product = new Product(0, "Хлопок", "Красный", "Логотип", 4,
                 "Converse Chuck Taylor Low Top", "70 лучше", 180, "Кеды", sizes);
-        DatabaseManager.getDatabase().editProduct(product.toString());
+        DatabaseManager.getDatabaseManager().editProduct(product.toString());
     }
 
     @Test
@@ -43,35 +46,35 @@ public class DatabaseTest {
         Product product = new Product(){{
             setProductId(12);
         }};
-        DatabaseManager.getDatabase().deleteProduct(product.toString());
+        DatabaseManager.getDatabaseManager().deleteProduct(product.toString());
     }
 
     @Test
     public void testDatabaseShowUsers() throws SQLException {
-        System.out.println(new Gson().toJson(DatabaseManager.getDatabase().showUsers()));
+        System.out.println(new Gson().toJson(DatabaseManager.getDatabaseManager().showUsers()));
     }
     @Test
     public void testDatabaseShowOrders() throws SQLException {
-        System.out.println(new Gson().toJson(DatabaseManager.getDatabase().showOrders()));
+        System.out.println(new Gson().toJson(DatabaseManager.getDatabaseManager().showOrders()));
     }
     @Test
     public void testDatabaseCreateOrder() throws SQLException {
 
         Order order = Order.orderBuilder().count(1).date(new Date()).delivery(false).user(User.userBuilder().userId(5).build()).
                 product(Product.productBuilder().sizes(new ArrayList<>()).build()).build();
-        order.getProduct().addSize(new Size(4, "2", 2));
-        DatabaseManager.getDatabase().createOrder(new Gson().toJson(order));
+        order.getProduct().addSize(Size.sizeBuilder().sizeId(4).build());
+        DatabaseManager.getDatabaseManager().createOrder(new Gson().toJson(order));
     }
     @Test
     public void testDatabaseDeleteOrder() throws SQLException {
         Order order = new Order();
         order.setOrderId(11);
-        DatabaseManager.getDatabase().deleteOrder(new Gson().toJson(order));
+        DatabaseManager.getDatabaseManager().deleteOrder(new Gson().toJson(order));
     }
 
     @Test
     public void testDateTimeFormat()
     {
-        System.out.println(new GsonDateFormatGetter().getGson().toJson(new Date()));
+         System.out.println(new GsonDateFormatGetter().getGson().toJson(new Date()));
     }
 }

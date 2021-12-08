@@ -1,4 +1,4 @@
-package server.Enums;
+package server.Consts;
 
 public enum  Role {
     ADMIN("a"), USER("u"), ERROR("e");
