@@ -70,7 +70,7 @@ class Server implements Runnable {
                                 else Server.Send(clientSocket, Role.USER.toString() + user);
                             } else Server.Send(clientSocket, Role.ERROR.toString());
                         }
-                        case Commands.SHOW_USERS -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(UserManager.getDatabaseManager().showUsers()));
+                        case Commands.SHOW_USERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showUsers()));
                         case Commands.EDIT_ADMIN -> Server.Send(clientSocket, AdminManager.getDatabaseManager().editAdmin(message[1]));
                         case Commands.SHOW_ADMIN -> Server.Send(clientSocket, AdminManager.getDatabaseManager().getAdminData(message[1]).toString());
                         case Commands.SET_NEW_ADMIN -> AdminManager.getDatabaseManager().SetNewAdmin(message[1]);
@@ -83,6 +83,13 @@ class Server implements Runnable {
                         case Commands.ADD_ORDER -> Server.Send(clientSocket, OrderManager.getDatabaseManager().createOrder(message[1]));
                         case Commands.DELETE_ORDER -> OrderManager.getDatabaseManager().deleteOrder(message[1]);
                         case Commands.SHOW_PRODUCT -> Server.Send(clientSocket, ProductManager.getDatabaseManager().ShowProduct(message[1]).toString());
+                        case Commands.ADD_CARD -> UserManager.getDatabaseManager().AddCard(message[1]);
+                        case Commands.EDIT_CARD -> UserManager.getDatabaseManager().EditCard(message[1]);
+                        case Commands.DELETE_CARD -> UserManager.getDatabaseManager().DeleteCard(message[1]);
+                        case Commands.EDIT_USER -> UserManager.getDatabaseManager().editUser(message[1]);
+                        case Commands.EDIT_USER_STATUS -> UserManager.getDatabaseManager().editUserStatus(message[1]);
+                        case Commands.SHOW_USER -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showUser(message[1])));
+
                     }
 
                 } catch (SQLException e) {

@@ -1,7 +1,7 @@
 package server.Models;
 
 import lombok.*;
-import server.FactoryGson.GsonGetter;
+import server.FactoryGson.GsonDateFormatGetter;
 
 @Getter
 @Setter
@@ -20,6 +20,6 @@ public class Admin extends User {
     @Override
     public String toString()
     {
-        return new GsonGetter().getGson().toJson(this);
+        return new GsonDateFormatGetter().getGson().toJson(this);
     }
 }

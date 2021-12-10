@@ -5,6 +5,7 @@ import server.Consts.MainAdminData;
 import server.Database.DatabaseConnector.DataBase;
 import server.FactoryGson.GsonDateFormatGetter;
 import server.Models.Admin;
+import server.Models.PaymentCard;
 import server.Models.User;
 
 import java.sql.ResultSet;
@@ -26,12 +27,17 @@ public class AdminManager {
 
     public Admin getAdminData(String message) {
         Admin admin = new GsonDateFormatGetter().getGson().fromJson(message, Admin.class);
-        String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.userId = test.admin.userId WHERE test.admin.adminId = " + admin.getAdminId();
+        String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.userId = test.admin.userId\n"+
+                "LEFT JOIN test.paymentcard ON test.paymentcard.userId = test.user.userId\n" +
+                " WHERE test.admin.adminId = " + admin.getAdminId();
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
-            return new Admin(rs.getInt(1), rs.getString("position"), new User(rs.getInt(5),
-                    rs.getString("login"), rs.getString("password"), rs.getString("name"), null));
+            return new Admin(rs.getInt("adminId"), rs.getString("position"), new User(rs.getInt("userId"),
+                    rs.getString("login"), rs.getString("password"), rs.getString("name"), new PaymentCard(
+                    rs.getInt("paymentCardId"), rs.getString("cardNumber"), rs.getInt("CVV"),
+                    rs.getDate("expiryDate")
+            ), rs.getBoolean("status")));
 
         } catch (SQLException e) {
             e.printStackTrace();

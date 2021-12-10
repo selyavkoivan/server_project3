@@ -14,6 +14,7 @@ public class User {
     protected String name;
     protected String password;
     protected PaymentCard card;
+    protected boolean status;
 
     public User(User user) {
         this.userId = user.userId;
@@ -21,6 +22,7 @@ public class User {
         this.name = user.name;
         this.password = user.password;
         card = user.card;
+        status = user.status;
     }
     @Override
     public String toString()

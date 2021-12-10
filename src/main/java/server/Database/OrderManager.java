@@ -65,7 +65,7 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password"), null),
+                                rs.getString(25), rs.getString("password"), null, rs.getBoolean("status")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
                                 rs.getInt("productId"), rs.getString(13),
@@ -98,7 +98,7 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password"), null),
+                                rs.getString(25), rs.getString("password"), null, rs.getBoolean("status")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
                                 rs.getInt("productId"), rs.getString(13),
