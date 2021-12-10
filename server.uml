@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>server</OriginalElement>
+  <nodes>
+    <node x="148.9418604651163" y="447.0">server.Main</node>
+    <node x="144.9418604651163" y="366.0">server.Server</node>
+    <node x="230.38953488372096" y="0.0">server.Consts</node>
+    <node x="20.0" y="83.0">server.FactoryGson</node>
+    <node x="218.83139534883722" y="273.0">server.Database</node>
+    <node x="139.25" y="168.0">server.Models</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="195.5" y="239.0" />
+  <SelectedNodes>
+    <node>server.FactoryGson</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

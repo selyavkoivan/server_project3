@@ -1,4 +1,4 @@
-package server.Database;
+package server.Database.DatabaseConnector;
 
 import lombok.Getter;
 

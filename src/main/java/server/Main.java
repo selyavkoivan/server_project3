@@ -1,11 +1,14 @@
 package server;
 
 
-import server.Database.DatabaseManager;
 import server.Consts.Commands;
 import server.Consts.Role;
-import server.FactoryGson.GsonGetter;
+import server.Database.AdminManager;
+import server.Database.OrderManager;
+import server.Database.ProductManager;
+import server.Database.UserManager;
 import server.FactoryGson.GsonDateFormatGetter;
+import server.FactoryGson.GsonGetter;
 import server.Models.Admin;
 import server.Models.User;
 
@@ -56,28 +59,28 @@ class Server implements Runnable {
                     String[] message = splitMessage();
                     System.out.println(message[1]);
                     switch (message[0]) {
-                        case Commands.SIGN_UP -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().reg(message[1]));
+                        case Commands.SIGN_UP -> Server.Send(clientSocket, UserManager.getDatabaseManager().reg(message[1]));
                         case Commands.SIGN_IN -> {
-                            User user = DatabaseManager.getDatabaseManager().sign(message[1]);
+                            User user = UserManager.getDatabaseManager().sign(message[1]);
                             if (user != null) {
-                                Admin admin = DatabaseManager.getDatabaseManager().getAdminData(user);
+                                Admin admin = AdminManager.getDatabaseManager().getAdminData(user);
                                 if (admin != null) Server.Send(clientSocket, Role.ADMIN.toString() + admin);
                                 else Server.Send(clientSocket, Role.USER.toString() + user);
                             } else Server.Send(clientSocket, Role.ERROR.toString());
                         }
-                        case Commands.SHOW_USERS -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(DatabaseManager.getDatabaseManager().showUsers()));
-                        case Commands.EDIT_ADMIN -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().editAdmin(message[1]));
-                        case Commands.SHOW_ADMIN -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().getAdminData(message[1]).toString());
-                        case Commands.SET_NEW_ADMIN -> DatabaseManager.getDatabaseManager().SetNewAdmin(message[1]);
-                        case Commands.SHOW_GOODS -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(DatabaseManager.getDatabaseManager().ShowGoods()));
-                        case Commands.EDIT_PRODUCT -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().editProduct(message[1]));
-                        case Commands.ADD_PRODUCT -> DatabaseManager.getDatabaseManager().addProduct(message[1]);
-                        case Commands.DELETE_PRODUCT -> DatabaseManager.getDatabaseManager().deleteProduct(message[1]);
-                        case Commands.SHOW_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(DatabaseManager.getDatabaseManager().showOrders()));
-                        case Commands.SHOW_USER_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(DatabaseManager.getDatabaseManager().showUserOrders(message[1])));
-                        case Commands.ADD_ORDER -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().createOrder(message[1]));
-                        case Commands.DELETE_ORDER -> DatabaseManager.getDatabaseManager().deleteOrder(message[1]);
-                        case Commands.SHOW_PRODUCT -> Server.Send(clientSocket, DatabaseManager.getDatabaseManager().ShowProduct(message[1]).toString());
+                        case Commands.SHOW_USERS -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(UserManager.getDatabaseManager().showUsers()));
+                        case Commands.EDIT_ADMIN -> Server.Send(clientSocket, AdminManager.getDatabaseManager().editAdmin(message[1]));
+                        case Commands.SHOW_ADMIN -> Server.Send(clientSocket, AdminManager.getDatabaseManager().getAdminData(message[1]).toString());
+                        case Commands.SET_NEW_ADMIN -> AdminManager.getDatabaseManager().SetNewAdmin(message[1]);
+                        case Commands.SHOW_GOODS -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(ProductManager.getDatabaseManager().ShowGoods()));
+                        case Commands.EDIT_PRODUCT -> Server.Send(clientSocket, ProductManager.getDatabaseManager().editProduct(message[1]));
+                        case Commands.ADD_PRODUCT -> ProductManager.getDatabaseManager().addProduct(message[1]);
+                        case Commands.DELETE_PRODUCT -> ProductManager.getDatabaseManager().deleteProduct(message[1]);
+                        case Commands.SHOW_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(OrderManager.getDatabaseManager().showOrders()));
+                        case Commands.SHOW_USER_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(OrderManager.getDatabaseManager().showUserOrders(message[1])));
+                        case Commands.ADD_ORDER -> Server.Send(clientSocket, OrderManager.getDatabaseManager().createOrder(message[1]));
+                        case Commands.DELETE_ORDER -> OrderManager.getDatabaseManager().deleteOrder(message[1]);
+                        case Commands.SHOW_PRODUCT -> Server.Send(clientSocket, ProductManager.getDatabaseManager().ShowProduct(message[1]).toString());
                     }
 
                 } catch (SQLException e) {
