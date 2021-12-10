@@ -4,10 +4,7 @@ import server.Database.OrderManager;
 import server.Database.ProductManager;
 import server.Database.UserManager;
 import server.FactoryGson.GsonDateFormatGetter;
-import server.Models.Order;
-import server.Models.Product;
-import server.Models.Size;
-import server.Models.User;
+import server.Models.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -72,6 +69,16 @@ public class DatabaseTest {
         Order order = new Order();
         order.setOrderId(11);
         OrderManager.getDatabaseManager().deleteOrder(new Gson().toJson(order));
+    }
+    @Test
+    public void testDatabaseAddCard() throws SQLException {
+        User user = User.userBuilder().userId(23).card(new PaymentCard(1, "1234567812345678", 332, new Date())).build();
+        UserManager.getDatabaseManager().AddCard(new GsonDateFormatGetter().getGson().toJson(user));
+    }
+    @Test
+    public void testDatabaseDeleteCard() throws SQLException {
+        User user = User.userBuilder().userId(23).build();
+        UserManager.getDatabaseManager().DeleteCard(new GsonDateFormatGetter().getGson().toJson(user));
     }
 
     @Test

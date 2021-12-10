@@ -1,9 +1,9 @@
 package server.Database;
 
-import com.google.gson.Gson;
 import server.Consts.Answer;
 import server.Consts.MainAdminData;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonDateFormatGetter;
 import server.Models.Admin;
 import server.Models.User;
 
@@ -25,13 +25,13 @@ public class AdminManager {
     }
 
     public Admin getAdminData(String message) {
-        Admin admin = new Gson().fromJson(message, Admin.class);
+        Admin admin = new GsonDateFormatGetter().getGson().fromJson(message, Admin.class);
         String query = "SELECT * FROM test.admin INNER JOIN test.user on test.user.userId = test.admin.userId WHERE test.admin.adminId = " + admin.getAdminId();
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
             return new Admin(rs.getInt(1), rs.getString("position"), new User(rs.getInt(5),
-                    rs.getString("login"), rs.getString("password"), rs.getString("name")));
+                    rs.getString("login"), rs.getString("password"), rs.getString("name"), null));
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,7 +56,7 @@ public class AdminManager {
 
     public String editAdmin(String adminStr) {
 
-        Admin admin = new Gson().fromJson(adminStr, Admin.class);
+        Admin admin = new GsonDateFormatGetter().getGson().fromJson(adminStr, Admin.class);
         String query = "UPDATE test.admin\n" +
                 "inner join test.user on test.user.userId = test.admin.userId\n" +
                 "set test.admin.position = '" + admin.getPosition() + "', test.user.login = '" + admin.getLogin() + "', test.user.name = '" + admin.getLogin() + "'\n" +
@@ -72,7 +72,7 @@ public class AdminManager {
     }
 
     public void SetNewAdmin(String data) throws SQLException {
-        Admin admin = new Gson().fromJson(data, Admin.class);
+        Admin admin = new GsonDateFormatGetter().getGson().fromJson(data, Admin.class);
         String query = "INSERT INTO test.admin (position, userId) \n" +
                 "VALUES ('" + admin.getPosition() + "', (SELECT userId FROM test.user where login = '" + admin.getLogin() + "'))";
         stmt.executeUpdate(query);

@@ -1,8 +1,8 @@
 package server.Database;
 
-import com.google.gson.Gson;
 import server.Consts.Answer;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonGetter;
 import server.Models.Product;
 import server.Models.Size;
 
@@ -63,7 +63,7 @@ public class ProductManager {
     }
 
     public Product ShowProduct(String message) {
-        Product product = new Gson().fromJson(message, Product.class);
+        Product product = new GsonGetter().getGson().fromJson(message, Product.class);
         String query = "SELECT * FROM test.product\n" +
                 "inner join test.material on test.material.materialId = test.product.materialId\n" +
                 "left join test.size on test.product.productId = test.size.productId\n" +
@@ -100,7 +100,7 @@ public class ProductManager {
     }
 
     public String editProduct(String message) {
-        Product product = new Gson().fromJson(message, Product.class);
+        Product product = new GsonGetter().getGson().fromJson(message, Product.class);
         String query = "UPDATE test.product\n" +
                 "inner join test.material on test.material.materialId = test.product.materialId\n" +
                 "set test.product.name = '" + product.getName() + "', test.product.description = '" + product.getDescription() + "', " +
@@ -123,7 +123,7 @@ public class ProductManager {
 
     public void addProduct(String message) throws SQLException {
 
-        Product product = new Gson().fromJson(message, Product.class);
+        Product product = new GsonGetter().getGson().fromJson(message, Product.class);
         String query = "INSERT INTO test.material (material, color, pattern)\n" +
                 "VALUES ('" + product.getMaterial() + "', '" + product.getColor() + "', '" + product.getPattern() + "');";
         stmt.executeUpdate(query);
@@ -141,7 +141,7 @@ public class ProductManager {
     }
 
     public void deleteProduct(String message) throws SQLException {
-        Product product = new Gson().fromJson(message, Product.class);
+        Product product = new GsonGetter().getGson().fromJson(message, Product.class);
         String query = "DELETE FROM test.product WHERE test.product.productId = " + product.getProductId();
         stmt.executeUpdate(query);
 

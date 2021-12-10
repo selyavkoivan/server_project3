@@ -1,9 +1,9 @@
 package server.Database;
 
-import com.google.gson.Gson;
 import server.Consts.Answer;
 import server.Consts.DateFormatter;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonDateFormatGetter;
 import server.Models.Order;
 import server.Models.Product;
 import server.Models.Size;
@@ -33,7 +33,7 @@ public class OrderManager {
 
 
     public String createOrder(String message) throws SQLException {
-        Order order = new Gson().fromJson(message, Order.class);
+        Order order = new GsonDateFormatGetter().getGson().fromJson(message, Order.class);
         if (SizeManager.getDatabaseManager().checkSizeCount(order) == Answer.SUCCESS.toString()) {
             String query = "";
             if (order.isDelivery())
@@ -65,7 +65,7 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password")),
+                                rs.getString(25), rs.getString("password"), null),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
                                 rs.getInt("productId"), rs.getString(13),
@@ -85,7 +85,7 @@ public class OrderManager {
     }
 
     public List<Order> showUserOrders(String message) {
-        User user = new Gson().fromJson(message, User.class);
+        User user = new GsonDateFormatGetter().getGson().fromJson(message, User.class);
         String query = "SELECT * FROM test.order\n" +
                 "inner join test.size on test.size.sizeID = test.order.sizeID\n" +
                 "inner join test.product on test.product.productId = test.size.productId\n" +
@@ -98,7 +98,7 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password")),
+                                rs.getString(25), rs.getString("password"), null),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
                                 rs.getInt("productId"), rs.getString(13),
@@ -118,7 +118,7 @@ public class OrderManager {
     }
 
     public void deleteOrder(String message) throws SQLException {
-        Order order = new Gson().fromJson(message, Order.class);
+        Order order = new GsonDateFormatGetter().getGson().fromJson(message, Order.class);
         String query = "DELETE FROM test.order\n" +
                 "WHERE test.order.orderId = " + order.getOrderId();
         stmt.executeUpdate(query);

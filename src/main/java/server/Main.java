@@ -42,7 +42,9 @@ class Server implements Runnable {
         while (true) {
             try {
                 clientSocket = serverSocket.accept();
+                System.out.println("Подключен новый пользователь : " + clientSocket.getInetAddress());
                 Menu();
+                System.out.println("Пользователь отключен : " + clientSocket.getInetAddress());
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -90,7 +92,6 @@ class Server implements Runnable {
 
             }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
         }
     }
 

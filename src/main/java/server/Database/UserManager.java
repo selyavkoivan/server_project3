@@ -1,9 +1,11 @@
 package server.Database;
 
-import com.google.gson.Gson;
 import server.Consts.Answer;
+import server.Consts.DateFormatter;
 import server.Consts.MainAdminData;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonDateFormatGetter;
+import server.Models.PaymentCard;
 import server.Models.User;
 
 import java.sql.ResultSet;
@@ -28,7 +30,7 @@ public class UserManager {
 
     public String reg(String data) {
 
-        User user = new Gson().fromJson(data, User.class);
+        User user = new GsonDateFormatGetter().getGson().fromJson(data, User.class);
         String query = "INSERT INTO test.user (login, password, name) VALUES ('" + user.getLogin() + "', '" + user.getPassword() + "', '" + user.getName() + "');";
 
         try {
@@ -45,13 +47,19 @@ public class UserManager {
     }
 
     public User sign(String data) {
-        User user = new Gson().fromJson(data, User.class);
-        String query = "SELECT * FROM test.user WHERE login = '" + user.getLogin() + "' AND password = '" + user.getPassword() + "'";
+        User user = new GsonDateFormatGetter().getGson().fromJson(data, User.class);
+        String query = "SELECT * FROM test.user\n" +
+                "LEFT JOIN test.paymentcar dON test.paymentcard.userId = test.user.userId\n" +
+                " WHERE login = '" + user.getLogin() + "' AND password = '" + user.getPassword() + "'";
 
         try {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
-            User loginUser = new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password"));
+            User loginUser = new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password"), new PaymentCard(
+                    rs.getInt("paymentCardId"), rs.getString("cardNumber"), rs.getInt("CVV"),
+                    rs.getDate("expiryDate")
+            ));
+
 
             return loginUser;
 
@@ -70,7 +78,7 @@ public class UserManager {
             ResultSet rs = stmt.executeQuery(query);
             List<User> users = new ArrayList<>();
             while (rs.next()) {
-                users.add(new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password")));
+                users.add(new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password"), null));
             }
             return users;
 
@@ -78,5 +86,35 @@ public class UserManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void AddCard(String message)
+    {
+        User user = new GsonDateFormatGetter().getGson().fromJson(message, User.class);
+        String query = "INSERT INTO test.paymentcard (cardNumber, CVV, expiryDate, userId)\n" +
+                " VALUES ('" +  user.getCard().getCardNumber() + "', '" + user.getCard().getCVV() + "', '" +
+                DateFormatter.DateTimeFormatter.format(user.getCard().getExpityDate()) + "', '" + user.getUserId() + "');";
+        try {
+            stmt.executeUpdate(query);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void DeleteCard(String message)
+    {
+        User user = new GsonDateFormatGetter().getGson().fromJson(message, User.class);
+        String query = "DELETE FROM test.paymentcard WHERE test.paymentcard.userId = " + user.getUserId();
+        try {
+            stmt.executeUpdate(query);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void EditCard(String message)
+    {
+        DeleteCard(message);
+        AddCard(message);
     }
 }

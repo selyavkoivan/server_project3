@@ -1,8 +1,8 @@
 package server.Database;
 
-import com.google.gson.Gson;
 import server.Consts.Answer;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonGetter;
 import server.Models.Order;
 import server.Models.Size;
 
@@ -26,7 +26,7 @@ public class SizeManager {
     }
 
     public void deleteSize(String message) throws SQLException {
-        Size size = new Gson().fromJson(message, Size.class);
+        Size size = new GsonGetter().getGson().fromJson(message, Size.class);
         String query = "DELETE FROM test.size WHERE test.size.sizeId = " + size.getSizeId();
         stmt.executeUpdate(query);
 
