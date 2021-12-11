@@ -86,7 +86,7 @@ class Server implements Runnable {
                         case Commands.ADD_CARD -> UserManager.getDatabaseManager().AddCard(message[1]);
                         case Commands.EDIT_CARD -> UserManager.getDatabaseManager().EditCard(message[1]);
                         case Commands.DELETE_CARD -> UserManager.getDatabaseManager().DeleteCard(message[1]);
-                        case Commands.EDIT_USER -> UserManager.getDatabaseManager().editUser(message[1]);
+                        case Commands.EDIT_USER -> Server.Send(clientSocket, UserManager.getDatabaseManager().editUser(message[1]));
                         case Commands.EDIT_USER_STATUS -> UserManager.getDatabaseManager().editUserStatus(message[1]);
                         case Commands.SHOW_USER -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showUser(message[1])));
 

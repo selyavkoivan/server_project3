@@ -49,10 +49,9 @@ public class AdminManager {
         String query = "SELECT * FROM test.admin WHERE userID = " + user.getUserId();
         try {
             ResultSet rs = stmt.executeQuery(query);
-            rs.next();
-            return new Admin(rs.getInt("adminId"), rs.getString("position"), user);
-
-        } catch (SQLException e) {
+            if(rs.next()) return  new Admin(rs.getInt("adminId"), rs.getString("position"), user);
+            return null;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

@@ -32,15 +32,19 @@ public class UserManager {
 
         User user = new GsonDateFormatGetter().getGson().fromJson(data, User.class);
         String query = "INSERT INTO test.user (login, password, name, status) VALUES ('" + user.getLogin() + "', '" + user.getPassword() + "', '" + user.getName() + "', 0);";
-
+        System.out.println(query);
         try {
-            stmt.executeQuery(query);
-            if (Objects.equals(user.getLogin(), MainAdminData.LOGIN)) {
-                AdminManager.getDatabaseManager().SetNewAdmin();
-            }
+            stmt.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
             return Answer.ERROR.toString();
+        }
+        if (Objects.equals(user.getLogin(), MainAdminData.LOGIN)) {
+            try {
+                AdminManager.getDatabaseManager().SetNewAdmin();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return Answer.SUCCESS.toString();
 
