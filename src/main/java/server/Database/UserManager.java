@@ -172,7 +172,7 @@ public class UserManager {
     public List<User> showFilterUsers(String message) {
         SortConfiguration filter = new GsonDateFormatGetter().getGson().fromJson(message, SortConfiguration.class);
         String query = "SELECT user.* FROM test.user\n" +
-                "where test.admin." + filter.getSortColumn() + " LIKE '%" + filter.getSortValue() + "%'";
+                "where test.user." + filter.getSortColumn() + " LIKE '%" + filter.getSortValue() + "%'";
         try {
             ResultSet rs = stmt.executeQuery(query);
             List<User> users = new ArrayList<>();

@@ -121,6 +121,7 @@ public class OrderManager {
                 "inner join test.material on test.material.materialId = test.product.materialId\n" +
                 "inner join test.user on test.user.userId = test.order.userId\n" +
                 "WHERE test.order.userId = " + user.getUserId() + " AND " + user.getSortColumn() + " LIKE '%" + user.getSortValue() + "%'";
+        System.out.println(query);
         try {
             ResultSet rs = stmt.executeQuery(query);
             List<Order> orders = new ArrayList<>();
