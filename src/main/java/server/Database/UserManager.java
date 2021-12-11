@@ -6,6 +6,7 @@ import server.Consts.MainAdminData;
 import server.Database.DatabaseConnector.DataBase;
 import server.FactoryGson.GsonDateFormatGetter;
 import server.Models.PaymentCard;
+import server.Models.SortConfiguration;
 import server.Models.User;
 
 import java.sql.ResultSet;
@@ -162,6 +163,23 @@ public class UserManager {
             rs.next();
             user = new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password"), null, rs.getBoolean("status"))  ;
             return user;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public List<User> showFilterUsers(String message) {
+        SortConfiguration filter = new GsonDateFormatGetter().getGson().fromJson(message, SortConfiguration.class);
+        String query = "SELECT user.* FROM test.user\n" +
+                "where test.admin." + filter.getSortColumn() + " LIKE '%" + filter.getSortValue() + "%'";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                users.add(new User(rs.getInt("userId"), rs.getString("login"), rs.getString("name"), rs.getString("password"), null, rs.getBoolean("status")));
+            }
+            return users;
 
         } catch (SQLException e) {
             e.printStackTrace();

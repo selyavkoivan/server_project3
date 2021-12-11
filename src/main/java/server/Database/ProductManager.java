@@ -2,9 +2,11 @@ package server.Database;
 
 import server.Consts.Answer;
 import server.Database.DatabaseConnector.DataBase;
+import server.FactoryGson.GsonDateFormatGetter;
 import server.FactoryGson.GsonGetter;
 import server.Models.Product;
 import server.Models.Size;
+import server.Models.SortConfiguration;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -145,5 +147,40 @@ public class ProductManager {
         String query = "DELETE FROM test.product WHERE test.product.productId = " + product.getProductId();
         stmt.executeUpdate(query);
 
+    }
+    public List<Product> ShowFilterGoods(String message) {
+        SortConfiguration filter = new GsonDateFormatGetter().getGson().fromJson(message, SortConfiguration.class);
+        String query = "SELECT * FROM test.product\n" +
+                "inner join test.material on test.material.materialId = test.product.materialId\n" +
+                "left join test.size on test.product.productId = test.size.productId\n" +
+                "WHERE " + filter.getSortColumn() + " LIKE '%" + filter.getSortValue() + "%'";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Product> goods = new ArrayList<>();
+            while (rs.next()) {
+                if (goods.size() == 0 || goods.get(goods.size() - 1).getProductId() != rs.getInt(1)) {
+                    goods.add(new Product(
+                            rs.getInt(7),
+                            rs.getString("material"),
+                            rs.getString("color"),
+                            rs.getString("pattern"),
+                            rs.getInt(1),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getDouble("price"),
+                            rs.getString("type")));
+                }
+                if (rs.getInt(11) != 0) goods.get(goods.size() - 1).addSize(new Size(
+                        rs.getInt(11),
+                        rs.getString("size"),
+                        rs.getInt("count")));
+
+            }
+
+            return goods;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
     }
 }

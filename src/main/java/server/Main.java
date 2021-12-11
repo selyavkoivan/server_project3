@@ -89,7 +89,9 @@ class Server implements Runnable {
                         case Commands.EDIT_USER -> Server.Send(clientSocket, UserManager.getDatabaseManager().editUser(message[1]));
                         case Commands.EDIT_USER_STATUS -> UserManager.getDatabaseManager().editUserStatus(message[1]);
                         case Commands.SHOW_USER -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showUser(message[1])));
-
+                        case Commands.FILTER_USERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showFilterUsers(message[1])));
+                        case Commands.FILTER_GOODS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(ProductManager.getDatabaseManager().ShowFilterGoods(message[1])));
+                        case Commands.FILTER_USER_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(OrderManager.getDatabaseManager().showUserFilterOrders(message[1])));
                     }
 
                 } catch (SQLException e) {

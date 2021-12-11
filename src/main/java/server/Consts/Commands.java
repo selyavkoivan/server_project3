@@ -22,5 +22,8 @@ public class Commands {
     public static final String ADD_CARD = "acd";
     public static final String EDIT_CARD = "ecd";
     public static final String DELETE_CARD = "dcd";
+    public static final String FILTER_USERS = "fus";
+    public static final String FILTER_GOODS = "fgs";
+    public static final String FILTER_USER_ORDERS = "fuo";
     public static final String ERROR = "err";
 }
