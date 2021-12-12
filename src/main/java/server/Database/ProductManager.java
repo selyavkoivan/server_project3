@@ -4,9 +4,7 @@ import server.Consts.Answer;
 import server.Database.DatabaseConnector.DataBase;
 import server.FactoryGson.GsonDateFormatGetter;
 import server.FactoryGson.GsonGetter;
-import server.Models.Product;
-import server.Models.Size;
-import server.Models.SortConfiguration;
+import server.Models.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,6 +36,7 @@ public class ProductManager {
                 "WHERE p.name = test.product.name\n" +
                 "), test.product.*, test.material.*, test.size.* FROM test.product\n" +
                 "inner join test.material on test.material.materialId = test.product.materialId\n" +
+                "left join test.review on test.review.productId = test.product.productId\n" +
                 "left join test.size on test.product.productId = test.size.productId";
         try {
             ResultSet rs = stmt.executeQuery(query);
@@ -64,6 +63,61 @@ public class ProductManager {
             }
 
             return goods;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+    public void SetRate(String message)
+    {
+        Review review = new GsonDateFormatGetter().getGson().fromJson(message, Review.class);
+        String query = "INSERT INTO test.review (productId, userId, rate) VALUES (" + review.getProduct().getProductId() +
+                ", " + review.getUser().getUserId() + ", " + review.getRate() + ");";
+        try {
+            stmt.executeUpdate(query);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    public List<Review> GetRates()
+    {
+        String query = "SELECT (SELECT avg(r.rate)\n" +
+                "FROM test.review r \n" +
+                "WHERE r.productId = test.review.productId), test.review.* \n" +
+                "FROM test.review";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Review> reviews = new ArrayList<>();
+            while (rs.next())
+            {
+                reviews.add(Review.reviewBuilder().reviewId(rs.getInt("reviewId")).rate(rs.getInt("rate"))
+                        .product(Product.productBuilder().productId(rs.getInt("productId")).build()).user(
+                                User.userBuilder().userId(rs.getInt("userId")).build()).averageRate(rs.getDouble(1)).build());
+            }
+            return reviews;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+    public List<Review> GetProductRates(String message)
+    {
+        Product product = new GsonGetter().getGson().fromJson(message, Product.class);
+        String query = "SELECT (SELECT avg(r.rate)\n" +
+                "FROM test.review r \n" +
+                "WHERE r.productId = test.review.productId), test.review.* \n" +
+                "FROM test.review\n"+
+                "WHERE test.review.productId = " + product.getProductId();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Review> reviews = new ArrayList<>();
+            while (rs.next())
+            {
+                reviews.add(Review.reviewBuilder().reviewId(rs.getInt("reviewId")).rate(rs.getInt("rate"))
+                        .product(Product.productBuilder().productId(rs.getInt("productId")).build()).user(
+                                User.userBuilder().userId(rs.getInt("userId")).build()).averageRate(rs.getDouble(1)).build());
+            }
+            return reviews;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return null;
