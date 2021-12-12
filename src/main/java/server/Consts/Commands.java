@@ -6,6 +6,7 @@ public class Commands {
     public static final String SHOW_USERS = "sus";
     public static final String SHOW_USER = "sur";
     public static final String SHOW_GOODS = "sgs";
+    public static final String EDIT_DELIVERY_STATUS = "eds";
     public static final String SHOW_PRODUCT = "spd";
     public static final String SHOW_ADMIN = "sad";
     public static final String SHOW_ORDERS = "sds";

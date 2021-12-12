@@ -21,24 +21,25 @@ import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) {
-        new Main().fireUp();
+        new Main().createServer();
     }
 
 
     final static int PORT = 60606;
     Socket _socket;
     ServerSocket _ssocket;
-    private  void fireUp() {
+
+    private void createServer() {
 
         try {
 
             _socket = new Socket();
             _ssocket = new ServerSocket(PORT);
-
+            System.out.println("Сервер запущен : " + _ssocket.getLocalSocketAddress());
             while (true) {
 
                 _socket = _ssocket.accept();
-
+                System.out.println(23);
                 new Server(_socket);
             }
 
@@ -58,17 +59,15 @@ public class Main {
             new Thread(this).start();
         }
 
-
+        @Override
         public void run() {
-            while (true) {
-                try {
-                    System.out.println("Подключен новый пользователь : " + clientSocket.getInetAddress());
-                    Menu();
-                    System.out.println("Пользователь отключен : " + clientSocket.getInetAddress());
-                    clientSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                System.out.println("Подключен новый пользователь : " + clientSocket.getInetAddress());
+                Menu();
+                System.out.println("Пользователь отключен : " + clientSocket.getInetAddress());
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -112,6 +111,7 @@ public class Main {
                             case Commands.FILTER_USERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(UserManager.getDatabaseManager().showFilterUsers(message[1])));
                             case Commands.FILTER_GOODS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(ProductManager.getDatabaseManager().ShowFilterGoods(message[1])));
                             case Commands.FILTER_USER_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(OrderManager.getDatabaseManager().showUserFilterOrders(message[1])));
+                            case Commands.EDIT_DELIVERY_STATUS -> OrderManager.getDatabaseManager().editOrderStatus(message[1]);
                         }
 
                     } catch (SQLException e) {

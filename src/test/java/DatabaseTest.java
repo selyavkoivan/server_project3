@@ -4,6 +4,7 @@ import server.Database.OrderManager;
 import server.Database.ProductManager;
 import server.Database.UserManager;
 import server.FactoryGson.GsonDateFormatGetter;
+import server.FactoryGson.GsonGetter;
 import server.Models.*;
 
 import java.sql.SQLException;
@@ -42,9 +43,7 @@ public class DatabaseTest {
 
     @Test
     public void testDatabaseDeleteProduct() throws SQLException {
-        Product product = new Product(){{
-            setProductId(12);
-        }};
+        Product product = Product.productBuilder().productId(23).build();
         ProductManager.getDatabaseManager().deleteProduct(product.toString());
     }
 
@@ -62,7 +61,7 @@ public class DatabaseTest {
         Order order = Order.orderBuilder().count(1).date(new Date()).delivery(false).user(User.userBuilder().userId(5).build()).
                 product(Product.productBuilder().sizes(new ArrayList<>()).build()).build();
         order.getProduct().addSize(Size.sizeBuilder().sizeId(4).build());
-        OrderManager.getDatabaseManager().createOrder(new Gson().toJson(order));
+        OrderManager.getDatabaseManager().createOrder(new GsonDateFormatGetter().getGson().toJson(order));
     }
     @Test
     public void testDatabaseDeleteOrder() throws SQLException {
@@ -80,10 +79,8 @@ public class DatabaseTest {
         User user = User.userBuilder().userId(23).build();
         UserManager.getDatabaseManager().DeleteCard(new GsonDateFormatGetter().getGson().toJson(user));
     }
-
     @Test
-    public void testDateTimeFormat()
-    {
-         System.out.println(new GsonDateFormatGetter().getGson().toJson(new Date()));
+    public void testDatabaseProductPopularity() throws SQLException{
+        System.out.println(new GsonGetter().getGson().toJson(ProductManager.getDatabaseManager().ShowGoodsPopularity()));
     }
 }

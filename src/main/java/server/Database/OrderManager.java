@@ -34,13 +34,14 @@ public class OrderManager {
         if (SizeManager.getDatabaseManager().checkSizeCount(order) == Answer.SUCCESS.toString()) {
             String query = "";
             if (order.isDelivery())
-                query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryAddress)\n" +
+                query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryAddress, deliveryDate, deliveryStatus)\n" +
                         "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
                         ", " + order.getCount() + ", '" + DateFormatter.DateTimeFormatter.format(order.getDate()) + "', " + order.isDelivery() + ", '" +
-                        order.getDeliveryAddress() + "');";
-            else query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery)\n" +
+                        order.getDeliveryAddress() + "', '" + DateFormatter.DateTimeFormatter.format(order.getDeliveryDate()) + "', " +order.getOrderId() + ");";
+            else query = "INSERT INTO test.order (userId, sizeId, countInOrder, date, delivery, deliveryDate, deliveryStatus)\n" +
                     "VALUES (" + order.getUser().getUserId() + ", " + order.getProduct().getSizes().get(0).getSizeId() +
-                    ", " + order.getCount() + ", '" + DateFormatter.DateTimeFormatter.format(order.getDate()) + "', " + order.isDelivery() + ");";
+                    ", " + order.getCount() + ", '" + DateFormatter.DateTimeFormatter.format(order.getDate()) + "', " + order.isDelivery() + ", '" +
+                    DateFormatter.DateTimeFormatter.format(order.getDeliveryDate()) + "', " +order.getOrderId() + ");";
             stmt.executeUpdate(query);
             return Answer.SUCCESS.toString();
         }
@@ -51,7 +52,12 @@ public class OrderManager {
 
     public List<Order> showOrders() {
 
-        String query = "SELECT * FROM test.order\n" +
+        String query = "SELECT (SELECT sum(o.countInOrder)\n" +
+                "FROM test.order o \n" +
+                "inner join test.size s on s.sizeID = o.sizeID\n" +
+                "inner join test.product p on p.productId = s.productId\n" +
+                "WHERE p.name = test.product.name\n" +
+                "), test.product.*, test.material.*, test.size.*, test.user.*, test.order.* FROM test.order\n" +
                 "inner join test.size on test.size.sizeID = test.order.sizeID\n" +
                 "inner join test.product on test.product.productId = test.size.productId\n" +
                 "inner join test.material on test.material.materialId = test.product.materialId\n" +
@@ -62,14 +68,15 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password"), null, rs.getBoolean("status")),
+                                rs.getString(19), rs.getString("password"), null, rs.getBoolean("status")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
-                                rs.getInt("productId"), rs.getString(13),
+                                rs.getInt("productId"), rs.getString(3),
                                 rs.getString("description"), rs.getDouble("price"),
-                                rs.getString("type")),
+                                rs.getString("type"), rs.getInt(1)),
                         rs.getInt("countInOrder"), rs.getDate("date"),
-                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"));
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"), rs.getDate("deliveryDate"),
+                        rs.getInt("deliveryStatus"));
                 order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
                         rs.getInt("count")));
                 orders.add(order);
@@ -95,14 +102,15 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password"), null, rs.getBoolean("status")),
+                                rs.getString(27), rs.getString("password"), null, rs.getBoolean("status")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
-                                rs.getInt("productId"), rs.getString(13),
+                                rs.getInt("productId"), rs.getString(15),
                                 rs.getString("description"), rs.getDouble("price"),
                                 rs.getString("type")),
                         rs.getInt("countInOrder"), rs.getDate("date"),
-                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"));
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"), rs.getDate("deliveryDate"),
+                        rs.getInt("deliveryStatus"));
                 order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
                         rs.getInt("count")));
                 orders.add(order);
@@ -128,14 +136,15 @@ public class OrderManager {
             while (rs.next()) {
                 Order order = new Order(rs.getInt("orderId"),
                         new User(rs.getInt("userId"), rs.getString("login"),
-                                rs.getString(25), rs.getString("password"), null, rs.getBoolean("status")),
+                                rs.getString(27), rs.getString("password"), null, rs.getBoolean("status")),
                         new Product(rs.getInt("materialId"), rs.getString("material"),
                                 rs.getString("color"), rs.getString("pattern"),
-                                rs.getInt("productId"), rs.getString(13),
+                                rs.getInt("productId"), rs.getString(15),
                                 rs.getString("description"), rs.getDouble("price"),
                                 rs.getString("type")),
                         rs.getInt("countInOrder"), rs.getDate("date"),
-                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"));
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"), rs.getDate("deliveryDate"),
+                        rs.getInt("deliveryStatus"));
                 order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
                         rs.getInt("count")));
                 orders.add(order);
@@ -150,6 +159,11 @@ public class OrderManager {
         Order order = new GsonDateFormatGetter().getGson().fromJson(message, Order.class);
         String query = "DELETE FROM test.order\n" +
                 "WHERE test.order.orderId = " + order.getOrderId();
+        stmt.executeUpdate(query);
+    }
+    public void editOrderStatus(String message) throws SQLException {
+        Order order = new GsonDateFormatGetter().getGson().fromJson(message, Order.class);
+        String query = "UPDATE test.order SET deliveryStatus = " + order.getOrderStatus() + " WHERE orderId = " + order.getOrderId();
         stmt.executeUpdate(query);
     }
 }

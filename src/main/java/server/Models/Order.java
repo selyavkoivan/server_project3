@@ -20,6 +20,8 @@ public class Order {
     private Date date;
     private boolean delivery;
     private String deliveryAddress;
+    private Date deliveryDate;
+    private int orderStatus;
 
     @Override
     public String toString()
