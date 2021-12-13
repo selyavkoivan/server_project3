@@ -1,6 +1,12 @@
 package server;
 
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import server.Consts.Commands;
 import server.Consts.Role;
 import server.Database.AdminManager;
@@ -12,6 +18,7 @@ import server.FactoryGson.GsonGetter;
 import server.Models.Admin;
 import server.Models.User;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,22 +26,28 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Getter
+ class Port{
+     private int port;
+}
 public class Main {
     public static void main(String[] args) {
         new Main().createServer();
     }
 
 
-    final static int PORT = 60606;
+
     Socket _socket;
     ServerSocket _ssocket;
 
     private void createServer() {
 
         try {
-
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(new FileReader("package.json"));
+            Port data = gson.fromJson(reader, Port.class);
             _socket = new Socket();
-            _ssocket = new ServerSocket(PORT);
+            _ssocket = new ServerSocket(data.getPort());
             System.out.println("Сервер запущен : " + _ssocket.getLocalSocketAddress());
             while (true) {
 
