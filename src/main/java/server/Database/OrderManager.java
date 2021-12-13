@@ -155,6 +155,40 @@ public class OrderManager {
             return null;
         }
     }
+    public List<Order> showFilterOrders(String message) {
+        SortConfiguration user = new GsonDateFormatGetter().getGson().fromJson(message, SortConfiguration.class);
+        String query = "SELECT * FROM test.order\n" +
+                "inner join test.size on test.size.sizeID = test.order.sizeID\n" +
+                "inner join test.product on test.product.productId = test.size.productId\n" +
+                "inner join test.material on test.material.materialId = test.product.materialId\n" +
+                "inner join test.user on test.user.userId = test.order.userId\n" +
+                "WHERE " + user.getSortColumn() + " LIKE '%" + user.getSortValue() + "%'";
+        System.out.println(query);
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            List<Order> orders = new ArrayList<>();
+            while (rs.next()) {
+                Order order = new Order(rs.getInt("orderId"),
+                        new User(rs.getInt("userId"), rs.getString("login"),
+                                rs.getString(27), rs.getString("password"), null, rs.getBoolean("status")),
+                        new Product(rs.getInt("materialId"), rs.getString("material"),
+                                rs.getString("color"), rs.getString("pattern"),
+                                rs.getInt("productId"), rs.getString(15),
+                                rs.getString("description"), rs.getDouble("price"),
+                                rs.getString("type")),
+                        rs.getInt("countInOrder"), rs.getDate("date"),
+                        rs.getBoolean("delivery"), rs.getString("deliveryAddress"), rs.getDate("deliveryDate"),
+                        rs.getInt("deliveryStatus"));
+                order.getProduct().addSize(new Size(rs.getInt("sizeId"), rs.getString("size"),
+                        rs.getInt("count")));
+                orders.add(order);
+            }
+            return orders;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public void deleteOrder(String message) throws SQLException {
         Order order = new GsonDateFormatGetter().getGson().fromJson(message, Order.class);
         String query = "DELETE FROM test.order\n" +

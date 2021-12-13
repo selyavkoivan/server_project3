@@ -3,16 +3,10 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import server.Consts.Commands;
 import server.Consts.Role;
-import server.Database.AdminManager;
-import server.Database.OrderManager;
-import server.Database.ProductManager;
-import server.Database.UserManager;
+import server.Database.*;
 import server.FactoryGson.GsonDateFormatGetter;
 import server.FactoryGson.GsonGetter;
 import server.Models.Admin;
@@ -129,8 +123,10 @@ public class Main {
                             case Commands.GET_RATES -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(ProductManager.getDatabaseManager().GetRates()));
                             case Commands.SET_RATE -> ProductManager.getDatabaseManager().SetRate(message[1]);
                             case Commands.EDIT_USER_PASSWORD -> UserManager.getDatabaseManager().editUserPassword(message[1]);
+                            case Commands.ADD_MESSAGE -> ChatManager.getDatabaseManager().AddMessage(message[1]);
+                            case Commands.GET_ORDER_MESSAGE -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(ChatManager.getDatabaseManager().GetMessages(message[1])));
+                            case Commands.FILTER_ORDERS -> Server.Send(clientSocket, new GsonDateFormatGetter().getGson().toJson(OrderManager.getDatabaseManager().showFilterOrders(message[1])));
                         }
-
                     } catch (SQLException e) {
                         e.printStackTrace();
 

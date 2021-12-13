@@ -30,5 +30,8 @@ public class Commands {
     public static final String SET_RATE = "srt";
     public static final String GET_RATES = "grs";
     public static final String GET_PRODUCT_RATES = "gpr";
+    public static final String ADD_MESSAGE = "ams";
+    public static final String GET_ORDER_MESSAGE = "gom";
+    public static final String FILTER_ORDERS = "fod";
     public static final String ERROR = "err";
 }
