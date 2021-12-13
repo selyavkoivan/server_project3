@@ -34,7 +34,7 @@ public class AdminManager {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
             return new Admin(rs.getInt("adminId"), rs.getString("position"), new User(rs.getInt("userId"),
-                    rs.getString("login"), rs.getString("password"), rs.getString("name"), new PaymentCard(
+                    rs.getString("login"), rs.getString("name"), rs.getString("password"), new PaymentCard(
                     rs.getInt("paymentCardId"), rs.getString("cardNumber"), rs.getInt("CVV"),
                     rs.getDate("expiryDate")
             ), rs.getBoolean("status")));

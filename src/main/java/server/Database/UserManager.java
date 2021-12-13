@@ -135,6 +135,21 @@ public class UserManager {
             return Answer.ERROR.toString();
         }
     }
+    public String editUserPassword(String userStr) {
+
+        User user = new GsonDateFormatGetter().getGson().fromJson(userStr, User.class);
+        String query = "UPDATE test.user\n" +
+                "set test.user.password = '" + user.getPassword() + "'\n" +
+                "where test.user.userId = " + user.getUserId();
+
+        try {
+            stmt.executeUpdate(query);
+            return Answer.SUCCESS.toString();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Answer.ERROR.toString();
+        }
+    }
     public void EditCard(String message)
     {
         DeleteCard(message);

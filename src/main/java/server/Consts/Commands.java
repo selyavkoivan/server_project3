@@ -14,6 +14,7 @@ public class Commands {
     public static final String EDIT_ADMIN = "adt";
     public static final String EDIT_USER = "udt";
     public static final String EDIT_USER_STATUS = "ust";
+    public static final String EDIT_USER_PASSWORD = "eup";
     public static final String EDIT_PRODUCT = "pdt";
     public static final String SET_NEW_ADMIN = "nad";
     public static final String ADD_PRODUCT = "apr";

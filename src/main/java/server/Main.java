@@ -115,6 +115,7 @@ public class Main {
                             case Commands.GET_PRODUCT_RATES -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(ProductManager.getDatabaseManager().GetProductRates(message[1])));
                             case Commands.GET_RATES -> Server.Send(clientSocket, new GsonGetter().getGson().toJson(ProductManager.getDatabaseManager().GetRates()));
                             case Commands.SET_RATE -> ProductManager.getDatabaseManager().SetRate(message[1]);
+                            case Commands.EDIT_USER_PASSWORD -> UserManager.getDatabaseManager().editUserPassword(message[1]);
                         }
 
                     } catch (SQLException e) {
